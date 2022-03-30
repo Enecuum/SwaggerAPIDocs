@@ -108,11 +108,236 @@ paths:
                     type: integer
                     description: Target speed 111111111111.
                     example: 15
-
-
-
-
-
+                  reward_ratio:
+                    type: object
+                    description: Reward ratio (TO BE EXPLAINED) for different node types and referrals (?)
+                    properties: 
+                      pos: 
+                        type: integer
+                        description: Reward ratio for PoS nodes
+                        example: 5500
+                      poa:
+                         type: integer
+                         description: Reward ratio for PoA nodes
+                         example: 3181
+                      pow:
+                         type: integer
+                         description: Reward ratio for PoW nodes
+                         example: 500
+                      ref:
+                        type: integer
+                        description: Reward ratio for referrals (TO BE EXPLAINED)
+                        example: 819
+                  transfer_lock:
+                    type: integer
+                    description: TO BE EXPLAINED
+                    example: 5
+                  pos_min_stake:
+                    type: integer
+                    description: Minimal stake for a PoS node
+                    example: 25000000000
+                  native_token:
+                    type: object
+                    description: Native token properties (TO BE CORRECTED)
+                    properties: 
+                      hash: 
+                        type: string
+                        description: Native token hash (TYPE?!)
+                        example: 0000000000000000000000000000000000000000000000000000000000000001
+                      owner:
+                        type: string
+                        description: Address of the wallet that created the native token
+                        example: 029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d
+                      fee_type:
+                        type: integer
+                        description: Fee type (see comment below)
+                        # 0 - flat fee for owner upon transaction in reward tokens, 1 - percent fee in reward tokens, 2 - native fee, fixed, charged in native tokens)
+                        example: 0
+                      fee_value:
+                        type: integer
+                        description: Fee value
+                        example: 1000000000
+                      ticker:
+                        type: string
+                        description: Native token ticker
+                        example: BIT
+                      decimals:
+                        type: integer
+                        description: Number of decimal places
+                        example: 10
+                      total_supply:
+                        type: integer
+                        description: Total supply of native tokens (BIGINT in JavaScript?)
+                        example: 2455559059822244864
+                      caption:
+                        type: string
+                        description: Token name (40 characters max? TO BE CHECKED)
+                        example: Enecuum Testnet BIT
+                      active:
+                        type: integer
+                        description: TO BE EXPLAINED
+                        example: 0
+                      reissuable:
+                        type: integer
+                        description: TO BE EXPLAINED (1 stands for tokens that can be minted and burned?)
+                        example: 0
+                      minable:
+                        type: integer
+                        description: TO BE CLARIFIED Whether a token can be mined or not
+                        example: 0
+                      max_supply:
+                        type: integer
+                        description: Maximum token supply
+                        example: 3500000000000000000
+                      block_reward:
+                        type: integer
+                        description: Reward for the mining of a block
+                        example: 30460000000
+                      min_stake:
+                        type: integer
+                        description: The minimal stake for a PoS node
+                        example: 250000000000
+                      referrer_stake:
+                        type: integer
+                        description: TO BE EXPLAINED
+                        example: 10000000000000
+                      ref_share:
+                        type: integer
+                        description: TO BE EXPLAINED
+                        example: 2574
+                      txs_count:
+                        type: integer
+                        description: (TO BE CLARIFIED) amount of transactions with this token
+                        example: 6406044
+                      cg_price_usd:
+                        type: integer
+                        description: CoinGecko price of the token in USDT? (TO BE CLARIFIED)
+                        example: 0.03952753
+                      dex_price_usd:
+                        type: integer
+                        description: Price of the token on pour DEX (ENEX? TO BE CLARIFIED)
+                        example: 0.03952753
+                      price_raw:
+                        type: object
+                        description: a different representation of cg_price_usd and dex_price_usd - explain about decimal places
+# TO BE CLARIFIED why cannot read a block mapping entry
+                        properties
+                          dex_price:
+                            type: integer
+                            description: Our DEX price, different representation
+                            example: 395275300
+                          decimals:
+                            type: integer
+                            description: Number of decimal places
+                            example: 10
+                  origin:
+                    type: object
+                    description: TO BE EXPLAINED
+                    properties
+                      publisher:
+                        type: string
+                        description: TO BE EXPLAINED
+                        example: 029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d
+                      reward:
+                        type: integer
+                        description: TO BE EXPLAINED
+                        example: 2449913938434801029
+                      hash:
+                        type: string
+                        description: TO BE EXPLAINED
+                        example: BITGENESIS
+                      link:
+                        type: string
+                        description: TO BE EXPLAINED
+                        example: BITGENESIS
+                      sprout:
+                        type: string
+                        description: TO BE EXPLAINED
+                        example: BITGENESIS
+                      time:
+                        type: integer
+                        description: TO BE EXPLAINED
+                        example: 0
+                  fee_shares:
+                    type: object
+                    description: TO BE EXPLAINED
+                    properties
+                      gen_share:
+                        type: integer
+                        description: TO BE EXPLAINED
+                        example: 300
+                      pow_share:
+                        type: integer
+                        description: TO BE EXPLAINED
+                        example: 50
+                      ldr_share:
+                        type: integer
+                        description: TO BE EXPLAINED
+                        example: 50
+                      pos_share:
+                        type: integer
+                        description: TO BE EXPLAINED
+                        example: 9600
+                  MPK:
+                    type: object
+                    description: TO BE EXPLAINED
+                    properties: 
+                      x:
+                        type: integer
+                        description: TO BE EXPLAINED
+                        example: 1 1887977886599394063028178950947279860127724050479032082036805996418912013153131127696715993837524647383570338355695255786360661495991220227612598684883028 3780267397673468252343519622281735554920859525529214838409547998448097213079684300112811104508239777017758612507356636174013439449215588949644233352733139
+                      y: 
+                        type: integer
+                        description: TO BE EXPLAINED
+                        example: 1 607218419856648654813472028821287383397295365990787484847671131205048590195733091420684296247120974745720384180519261046258140424163987254801646299078125 3574484102938033217678888696334982695759754668992496989785966938244090853405896393856377280681069520660874902711918462986779665727013338716276831662950626
+                  mblock_slots:
+                    type: object
+                    description: TO BE EXPLAINED
+                    properties
+                      size:
+                        type: integer
+                        description: TO BE EXPLAINED
+                        example: 2
+                      count:
+                        type: integer
+                        description: TO BE EXPLAINED
+                        example: 2
+                      min_stake:
+                        type: integer
+                        description: TO BE EXPLAINED - minimal stake
+                        example: 5000000000000000
+                  dex:
+                    type: object
+                    description: TO BE EXPLAINED
+                    properties
+                      DEX_COMMANDER_ADDRESS:
+                        type: string
+                        description: TO BE EXPLAINED
+                        example: 033333333333333333333333333333333333333333333333333333333333333333
+                      DEX_BURN_ADDRESS:
+                        type: string
+                        description: TO BE EXPLAINED
+                        example: 02dead000000000000000000000000000000000000000000000000000000000000
+                      DEX_ENX_TOKEN_HASH:
+                        type: string
+                        description: TO BE EXPLAINED
+                        example: 824e7b171c01e971337c1b25a055023dd53c003d4aa5aa8b58a503d7c622651e
+                      DEX_SPACE_STATION_ID:
+                        type: string
+                        description: TO BE EXPLAINED
+                        example: 50789932e52d80ff65a56547274498d865ce1d85f14bbacdcd5b575191f87621
+                      DEX_COMMANDER_FEE:
+                        type: integer
+                        description: TO BE EXPLAINED
+                        example: 5
+                      DEX_POOL_FEE:
+                        type: integer
+                        description: TO BE EXPLAINED
+                        example: 30
+                      DEX_TRUSTED_TOKENS:
+                        type: string
+                        description: TO BE EXPLAINED
+                        example: 824e7b171c01e971337c1b25a055023dd53c003d4aa5aa8b58a503d7c622651e
 
   /tx:
     post:
