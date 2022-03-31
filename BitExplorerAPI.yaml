@@ -219,9 +219,8 @@ paths:
                         example: 0.03952753
                       price_raw:
                         type: object
-                        description: a different representation of cg_price_usd and dex_price_usd - explain about decimal places
-# TO BE CLARIFIED why cannot read a block mapping entry
-                        properties
+                        description: a different representation of cg_price_usd and dex_price_usd
+                        properties:
                           dex_price:
                             type: integer
                             description: Our DEX price, different representation
@@ -233,7 +232,7 @@ paths:
                   origin:
                     type: object
                     description: TO BE EXPLAINED
-                    properties
+                    properties:
                       publisher:
                         type: string
                         description: TO BE EXPLAINED
@@ -261,7 +260,7 @@ paths:
                   fee_shares:
                     type: object
                     description: TO BE EXPLAINED
-                    properties
+                    properties:
                       gen_share:
                         type: integer
                         description: TO BE EXPLAINED
@@ -293,7 +292,7 @@ paths:
                   mblock_slots:
                     type: object
                     description: TO BE EXPLAINED
-                    properties
+                    properties:
                       size:
                         type: integer
                         description: TO BE EXPLAINED
@@ -309,7 +308,7 @@ paths:
                   dex:
                     type: object
                     description: TO BE EXPLAINED
-                    properties
+                    properties:
                       DEX_COMMANDER_ADDRESS:
                         type: string
                         description: TO BE EXPLAINED
