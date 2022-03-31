@@ -221,6 +221,10 @@ paths:
                         type: object
                         description: a different representation of cg_price_usd and dex_price_usd
                         properties:
+                          cg_price:
+                            type: integer
+                            description: CoinGecko price, different representation
+                            example: 395275300
                           dex_price:
                             type: integer
                             description: Our DEX price, different representation
