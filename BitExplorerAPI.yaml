@@ -124,6 +124,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/inline_response_200_6'
+  /get_token_info_page:
+    get:
+      tags:
+      - General
+      summary: Returns the properties of the tokens listed on a specific BIT Explorer page. If no page number is specified, the amount of tokens to be displayed on a page and the total number of token info pages are returned.
+      parameters:
+      - name: page
+        in: query
+        description: Page number.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Properties of the tokens listed on the specified page.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_6'
 components:
   schemas:
     inline_response_200:
