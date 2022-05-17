@@ -1614,7 +1614,7 @@ paths:
 
 # BIT Explorer API description starts here
 
-# WARNiNG!
+# WARNING!
 #
 # Node API and Explorer API have a number of endpoints with identical names that invalidate the description.
 # Worse still, these "namesake" endpoints sometimes have the same argument but yield quite different output
@@ -1722,7 +1722,7 @@ paths:
                         type: integer
                         description: TO BE EXPLAINED
                         # has something to do with mining slots?
-                        example: 0
+                        example: 1
                       reissuable:
                         type: integer
                         description: (1 stands for tokens that can be minted and burned?)
@@ -2132,7 +2132,7 @@ paths:
                   hash: 
                     type: string
                     description: Token hash
-                    example: 0000000000000000000000000000000000000000000000000000000000000001
+                    example: '0000000000000000000000000000000000000000000000000000000000000001'
                   owner:
                     type: string
                     description: Address of the account that created the token
@@ -2307,7 +2307,7 @@ paths:
                     example: 30460000000
                   min_stake:
                     type: integer
-                    description: Minimal stake for a PoS node
+                    description: Minimal stake for a PoA node (apples if the token is mineable) 
                     example: 250000000000
                   referrer_stake:
                     type: integer
@@ -2857,7 +2857,7 @@ components:
       example: 10000000000000
     MinStake:
       type: integer
-      description: Minimum stake required for mining.
+      description: Minimum stake required for PoA mining.
       example: 250000000000
     Reissuable:
       type: integer
