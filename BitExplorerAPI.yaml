@@ -1223,11 +1223,11 @@ paths:
                       fee_value:
                         type: integer
                         description: For flat fee, the fee amount is multiplied by 10^*d*, where *d* stands for the number of decimal places. For percent fee, the fee amount is multiplied by 100.
-                        example: 100000000
+                        example: 10000000000
                       fee_min:
                         type: integer
                         description: The minimum flat fee in case the token uses percent fee. 
-                        example: 100000000
+                        example: 10000000000
                       ticker:
                         $ref: '#/components/schemas/Ticker'
                       decimals:
@@ -1235,11 +1235,11 @@ paths:
                       total_supply:
                         type: integer
                         description: The token emission. The amount is multiplied by 10^*d*, where *d* stands for the number of decimal places. 
-                        example: 3383481700000000000
+                        example: 5010637449999934464
                       caption:
                         type: string
                         description: A 0-40 character token description. Can be empty.
-                        example: Enecuum testnet coin
+                        example: mining token 2
                       active:
                         type: integer
                         description: |
@@ -1255,11 +1255,11 @@ paths:
                       max_supply:
                         type: integer
                         description: A maximum token emission. Upon reaching this number, the token can no longer be mined.
-                        example: 9000000000000000000
+                        example: 10000000000000000000
                       block_reward:
                         type: integer
                         description: A reward for each mined macroblock. This number includes the referral reward.
-                        example: 96560000000
+                        example: 50000000000
                       min_stake:
                         $ref: '#/components/schemas/MinStake'
                       referrer_stake:
@@ -1268,6 +1268,34 @@ paths:
                         type: integer
                         description: A share of the total block reward that determines the referral reward amount. The referral reward is distributed among the referral and their agent equally
                         example: 1000
+                      txs_count:
+                        type: integer
+                        description: The number of transactions with this token (within which timeframe?)
+                        example: 1
+                      cg_price_usd:
+                        type: integer
+                        description: CoinGecko price of the token
+                        example: null
+                      dex_price_usd:
+                        type: integer
+                        description: Price of the token on pour DEX (ENEX? TO BE CLARIFIED)
+                        example: 0.0361261927
+                      price_raw:
+                        type: object
+                        description: another ("raw", without decimal point) representation of cg_price_usd and dex_price_usd
+                        properties:
+                          cg_price:
+                            type: integer
+                            description: CoinGecko price, different representation
+                            example: null
+                          dex_price:
+                            type: integer
+                            description: Our DEX price, different representation
+                            example: 361261927
+                          decimals:
+                            type: integer
+                            description: Number of decimal places
+                            example: 10
                 examples:
                   reissuable:
                     description: Tokens with a flexible supply. After the token release, its supply can be changed by issuing or burning of coins.
@@ -1741,7 +1769,7 @@ paths:
                         example: 30460000000
                       min_stake:
                         type: integer
-                        description: The minimal stake for a PoS node
+                        description: The minimal stake for a PoA node (applies to mineable tokens only? null for others)
                         example: 250000000000
                       referrer_stake:
                         type: integer
@@ -2079,7 +2107,7 @@ paths:
 #                    example: 30460000000
 #                  min_stake:
 #                    type: integer
-#                    description: Minimal stake for a PoS node
+#                    description: Minimal stake for a PoA node
 #                    example: 250000000000
 #                  referrer_stake:
 #                    type: integer
@@ -2754,12 +2782,12 @@ components:
     Ticker:
       type: string
       description: An upper-case 1-6 letter token ticker.
-      example: ENQ
+      example: TTMNG
       
     Hash:
       type: string
       description: Transaction or block SHA256 hash.
-      example: 1274fe466eba7af8e012d0d7eb3f3a1d05ce50578529ba4055ece98b96656908
+      example: de0942b3b1194cde66ba9bf45bd1bdf406e714d6d514b8c0e6fd58b5ee833693
     
     Decimals:
       type: integer
@@ -2862,12 +2890,12 @@ components:
     Reissuable:
       type: integer
       description:  1 means the token has flexible supply, i.e., after tokens release, its supply can be changed by issuing or burning of coins. 0 means the token's supply can't be changed. 
-      example: 1
+      example: 0
       enum: [0,1]
     Minable:
       type: integer
       description: 1 means the token can be mined. Some volume is selected for instant release (pre-mine), and the rest is mined by users. 0 means the token can't be mined.
-      example: 0
+      example: 1
       enum: [0,1]
       
 # SwaggerHub warned the definition was declared but never used, so I commented it away
