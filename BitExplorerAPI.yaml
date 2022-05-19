@@ -2349,6 +2349,10 @@ paths:
                     type: integer
                     description: (TO BE CLARIFIED) Amount of transactions with this token
                     example: 6406044
+                  in_slot:
+                    type: integer
+                    description: Describes whether the token is in the (current) mining slot (TO BE CLARIFIED)
+                    example: 0
                   cg_price_usd:
                     type: integer
                     description: CoinGecko price of the token in USD (TO BE CLARIFIED)
