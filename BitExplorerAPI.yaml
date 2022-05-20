@@ -2275,125 +2275,153 @@ paths:
             application/json:
               schema:
                 properties: 
-                  tokens:
-                    type: array
-                    items:
-                      type: object
+                  hash: 
+                    type: string
+                    description: Token hash
+                    example: '0000000000000000000000000000000000000000000000000000000000000001'
+                  owner:
+                    type: string
+                    description: Address of the account that created the token
+                    example: '029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d'
+                  fee_type:
+                    type: integer
+                    enum: [0,1,2]
+                    description: Fee type |
+                      0 - flat fee for owner upon transaction in reward tokens
+                      1 - percentage fee in reward tokens
+                      2 - fixed fee, charged in native tokens
+#                    (see comment below, TO BE CLARIFIED - see comment below)
+                    # 0 - flat fee for owner upon transaction in reward tokens, 1 - percentage fee in reward tokens, 2 - fixed fee, charged in native tokens)
+                    example: 0
+                  fee_value:
+                    type: integer
+                    description: Fee value
+                    example: 1000000000
+                  fee_min:
+                    type: integer
+                    description: Minimal fee
+                    example: 1000000000
+                  ticker:
+                    type: string
+                    description: Token ticker
+                    example: BIT
+                  decimals:
+                    type: integer
+                    description: Number of decimal places
+                    example: 10
+                  total_supply:
+                    type: string
+                    description: Total supply of the token
+                    example: 2455559059822244864
+                  caption:
+                    type: string
+                    description: Long token name
+                    example: Enecuum Testnet BIT
+                  active:
+                    type: integer
+                    enum: [0,1]
+                    description: TO BE EXPLAINED (something to do with mining slots?)
+                    example: 0
+                  reissuable:
+                    type: integer
+                    enum: [0,1]
+                    description: Indicates whether the token is reissuable (can be minted and burned)
+                    example: 0
+                  minable:
+                    type: integer
+                    enum: [0,1]
+                    description: Indicates whether a token can be mined
+                    example: 1
+                  max_supply:
+                    type: integer
+                    description: Maximum token supply
+                    example: 3500000000000000000
+                  block_reward:
+                    type: integer
+                    description: Reward for the mining of a block
+                    example: 30460000000
+                  min_stake:
+                    type: integer
+                    description: Minimal stake for a PoA node (apples if the token is mineable) 
+                    example: 250000000000
+                  referrer_stake:
+                    type: integer
+                    description: TO BE EXPLAINED
+                    example: 10000000000000
+                  ref_share:
+                    type: integer
+                    description: TO BE EXPLAINED
+                    example: 2574
+                  txs_count:
+                    type: integer
+                    description: (TO BE CLARIFIED) Amount of transactions with this token
+                    example: 6406044
+                  in_slot:
+                    type: integer
+                    description: Describes whether the token is in the (current) mining slot (TO BE CLARIFIED)
+                    example: 0
+                  cg_price_usd:
+                    type: integer
+                    description: CoinGecko price of the token in USD (TO BE CLARIFIED)
+                    example: 0.03952753
+                  dex_price_usd:
+                    type: integer
+                    description: Price of the token on pour DEX (ENEX? TO BE CLARIFIED)
+                    example: 0.03952753
+                  price_raw:
+                    type: object
+                    description: another ("raw", without decimal point) representation of cg_price_usd and dex_price_usd
+                    properties:
+                      cg_price:
+                        type: integer
+                        description: CoinGecko price, different representation
+                        example: 395275300
+                      dex_price:
+                        type: integer
+                        description: Our DEX price, different representation
+                        example: 395275300
+                      decimals:
+                        type: integer
+                        description: Number of decimal places
+                        example: 10
+  /sblock
+    get:
+      summary: 'Returns the properties of a sblock'
+      parameters:
+        - in: query
+          name: hash
+          required: true
+          description: 'Sblock hash'
+      schema: 
+        type: string
+      responses:
+        '200':
+          description: 'Properties of the sblock'
+          content:
+            application/json:
+              schema:
+                properties:
+                  header:
+                    type: object
+                    description: Sblock header
                       properties:
-                        hash: 
-                          type: string
-                          description: Token hash
-                          example: '0000000000000000000000000000000000000000000000000000000000000001'
-                        owner:
-                          type: string
-                          description: Address of the account that created the token
-                          example: 029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d
-                        fee_type:
-                          type: integer
-                          enum: [0,1,2]
-                          description: Fee type. 0 - flat fee for owner upon transaction in reward tokens, 1 - percent fee in reward tokens, 2 - native fee, fixed, charged in native tokens).
-                          example: 0
-                        fee_value:
-                          type: integer
-                          description: Fee value
-                          example: 1000000000
-                        fee_min:
-                          type: integer
-                          description: Minimal fee
-                          example: 1000000000
-                        ticker:
-                          type: string
-                          description: Token ticker
-                          example: BIT
-                        decimals:
-                          type: integer
-                          description: Number of decimal places
-                          example: 10
-                        total_supply:
-                          type: string
-                          description: Total supply of the token
-                          example: 2455559059822244864
-                        caption:
-                          type: string
-                          description: Long token name
-                          example: Enecuum Testnet BIT
-                        active:
-                          type: integer
-                          enum: [0,1]
-                          description: TO BE EXPLAINED (has something to do with mining slots?)
-                          example: 0
-                        reissuable:
-                          type: integer
-                          enum: [0,1]
-                          description: Indicates whether the token is reissuable (can be minted and burned) or not.
-                          example: 0
-                        minable:
-                          type: integer
-                          enum: [0,1]
-                          description: Indicates whether a token can be mined or not
-                          example: 1
-                        max_supply:
-                          type: integer
-                          description: Maximum token supply
-                          example: 3500000000000000000
-                        block_reward:
-                          type: integer
-                          description: Reward for the mining of a block
-                          example: 30460000000
-                        min_stake:
-                          type: integer
-                          description: Minimal stake for a PoA node (apples if the token is mineable) 
-                          example: 250000000000
-                        referrer_stake:
-                          type: integer
-                          description: TO BE EXPLAINED
-                          example: 10000000000000
-                        ref_share:
-                          type: integer
-                          description: TO BE EXPLAINED
-                          example: 2574
-                        txs_count:
-                          type: integer
-                          description: (TO BE CLARIFIED) Amount of transactions with this token
-                          example: 6406044
-                        in_slot:
-                          type: integer
-                          description: Describes whether the token is in the (current) mining slot (TO BE CLARIFIED)
-                          example: 0
-                        cg_price_usd:
-                          type: integer
-                          description: CoinGecko price of the token in USD (TO BE CLARIFIED)
-                          example: 0.03952753
-                        dex_price_usd:
-                          type: integer
-                          description: Price of the token on pour DEX (ENEX? TO BE CLARIFIED)
-                          example: 0.03952753
-                        price_raw:
-                          type: object
-                          description: another ("raw", without decimal point) representation of cg_price_usd and dex_price_usd
-                          properties:
-                            cg_price:
-                              type: integer
-                              description: CoinGecko price, different representation
-                              example: 395275300
-                            dex_price:
-                              type: integer
-                              description: Our DEX price, different representation
-                              example: 395275300
-                            decimals:
-                              type: integer
-                              description: Number of decimal places
-                              example: 10
-# tokens section ends about here
-                  page_size:
-                    type: integer
-                    description: Number of tokens represented on one page
-                    example: 20
-                  page_count:
-                    type: integer
-                    description: Total number of pages with token info
-                    example: 72
-
+                      kblocks_hash:
+                        type: string
+                        description: Kblock hash
+                        example: '395275300'
+                      publisher:
+                        type: string
+                        description: Publisher wallet hash
+                        example: '395275300'
+                      sblocks_hash:
+                        type: string
+                        description: Sblock hash
+                        example: '8a643dc237d86c948bbed5b9bc6f22366d2be54df7722bbddafbe6597b37db84'
+                      reward: 
+                        type: integer 
+                        description: Reward (TO BE CLARIFIED) 
+                        example: 16753000000
+                        
 # All Schema definitions below are from the old Enecuum NodeAPI definition. As of now, they are used inconsistently throughout the document.
 
 components:
