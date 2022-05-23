@@ -96,6 +96,7 @@ servers:
     url: https://virtserver.swaggerhub.com/enecuum/EnecuumNodeAPI/1.0.0
   
 paths: 
+
   /tx:
     post:
       tags: 
@@ -2384,17 +2385,18 @@ paths:
                         type: integer
                         description: Number of decimal places
                         example: 10
-  /sblock
+  \sblock:
     get:
-      summary: 'Returns the properties of a sblock'
-      parameters:
-        - in: query
-          name: hash
-          required: true
-          description: 'Sblock hash'
-      schema: 
+    summary: 'Returns the properties of a sblock'
+    parameters:
+    - in: query
+      name: hash
+      schema:
         type: string
-      responses:
+      required: true
+      description: 'Sblock hash'
+      example: 'de0942b3b1194cde66ba9bf45bd1bdf406e714d6d514b8c0e6fd58b5ee833693'
+      responses: 
         '200':
           description: 'Properties of the sblock'
           content:
@@ -2404,7 +2406,7 @@ paths:
                   header:
                     type: object
                     description: Sblock header
-                      properties:
+                    properties:
                       kblocks_hash:
                         type: string
                         description: Kblock hash
@@ -2419,8 +2421,47 @@ paths:
                         example: '8a643dc237d86c948bbed5b9bc6f22366d2be54df7722bbddafbe6597b37db84'
                       reward: 
                         type: integer 
-                        description: Reward (TO BE CLARIFIED) 
-                        example: 16753000000
+                      description: Reward (TO BE CLARIFIED) 
+#                        example: 16753000000        
+
+#  \sblock:
+#    get:
+#      summary: 'Returns the properties of a sblock'
+#      parameters:
+#       - in: query
+#      name: hash
+#      schema: 
+#        type: string
+#        required: true
+#        description: 'Sblock hash'
+#        example: 'de0942b3b1194cde66ba9bf45bd1bdf406e714d6d514b8c0e6fd58b5ee833693'
+#      responses:
+#        '200':
+#         description: 'Properties of the sblock'
+#          content:
+#            application/json:
+#              schema:
+#                properties:
+#                  header:
+#                    type: object
+#                    description: Sblock header
+#                      properties:
+#                      kblocks_hash:
+#                        type: string
+##                        description: Kblock hash
+#                        example: '395275300'
+#                      publisher:
+#                        type: string
+#                        description: Publisher wallet hash
+#                        example: '395275300'
+#                      sblocks_hash:
+#                        type: string
+#                        description: Sblock hash
+#                        example: '8a643dc237d86c948bbed5b9bc6f22366d2be54df7722bbddafbe6597b37db84'
+#                      reward: 
+#                        type: integer 
+#                        description: Reward (TO BE CLARIFIED) 
+#                        example: 16753000000
                         
 # All Schema definitions below are from the old Enecuum NodeAPI definition. As of now, they are used inconsistently throughout the document.
 
