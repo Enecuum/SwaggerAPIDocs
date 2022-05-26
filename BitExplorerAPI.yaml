@@ -96,7 +96,6 @@ servers:
     url: https://virtserver.swaggerhub.com/enecuum/EnecuumNodeAPI/1.0.0
   
 paths: 
-
   /tx:
     post:
       tags: 
@@ -880,99 +879,213 @@ paths:
                     height:
                       $ref: '#/components/schemas/Height'
                       
-  /macroblock:
-    get: 
-      tags: 
-        - General
-      summary: 'Returns contents of a macroblock.'
-      description: 'Returns k-block, microblocks and s-blocks attached to it. Microblock hashes are sorted lexicographically in hexadecimal format.'
+#  /macroblock:
+#    get: 
+#      tags: 
+#        - General
+##      summary: 'Returns contents of a macroblock.'
+#      description: 'Returns k-block, microblocks and s-blocks attached to it. Microblock hashes are sorted lexicographically in hexadecimal format.'
+#      parameters:
+#        - name: hash
+#          in: query
+#          required: true
+#          description: 'Macroblock/k-block hash.'
+#          example: 0028caa83e2cba8d32e6448130805f168d9348218ce37d7d35993ad050b7952b
+#          schema:
+#            $ref: '#/components/schemas/Hash'
+#      responses:
+#        '200':
+#          description: Successfully returned macroblock content.
+#          content:
+#            application/json:
+#              schema:
+#                type: object
+#                properties:
+#                  kblock:
+#                    type: object
+#                    description: 'K-block content. A macroblock can contain only one k-block.'
+#                    properties:
+#                      hash: 
+#                        allOf:
+#                          - $ref: '#/components/schemas/Hash'
+#                          - example: 0028caa83e2cba8d32e6448130805f168d9348218ce37d7d35993ad050b7952b
+#                      n:
+#                        type: integer
+#                        description: 'Height of the macroblock.' 
+#                        example: 5211
+#                      time:
+#                        type: integer
+#                        description: 'K-block publishing time in Unix Time format.' 
+#                        example: 1592385962
+#                      publisher:
+#                       type: string
+#                        description: 'Public key of a k-block publisher.' 
+#                        example: 034b4875bf08ffd5a4f0b06c21f951aa3e2f979d2d9f1bb4a64e0600eac2350beb
+#                      nonce:
+#                        allOf:
+#                          - $ref: '#/components/schemas/Nonce'
+#                          - example: 41
+#                      link:
+#                        type: string
+#                        description: 'Previous k-block hash.' 
+#                        example: 00fb459c1f8de0b24d074641a76878ab9528acaf62a9a33a0d9874a92e3349b5
+#                      sprout:
+#                        type: string
+#                        description: 'Merkle tree top hash.' 
+#                        example: BITGENESIS
+#                      m_root:
+#                        type: string
+#                        description: 'Merkle tree root.' 
+#                        example: 61b80791bfdd95cf958b3eb21412dc15634f15b5e692e68401abdf9b1d794135
+#                      reward:
+#                        type: integer
+#                        description: 'Reward for k-block mining.' 
+#                        example: 15449600000
+#                      target_diff:
+#                        type: integer
+#                        description: 'Hash calculation difficulty.' 
+#                        example: 141304204
+#                  mblocks:
+#                    type: array
+#                    description: 'Microblock content. There can be multiple microblocks. In each microblock, there can be multiple transactions.'
+#                    items:
+#                      type: object
+#                      properties:
+#                        hash:
+#                          $ref: '#/components/schemas/Hash'
+#                        tx_cnt:
+#                          type: integer
+#                          description: 'The amount of transactions in a microblock.'
+#                    example:
+#                      - hash: bfac67dcb2f2b7a8275f0787c8c98f356b6a51635de61bc981c0eec386453fe7
+#                        tx_cnt: 3
+#                      - hash: caa23e95b2cd0f11f5713a340309c1148a9519c4178330f03e95a82b612758bb
+#                        tx_cnt: 3
+#                  sblocks:
+#                    type: array
+#                    description: 'Statblock content. There can be multiple statblocks.'
+#                    items:
+#                      type: object
+#                      properties:
+#                        hash:
+#                          $ref: '#/components/schemas/Hash'
+#                    example:
+#                      - hash: 57c5d28b3e82508a873d0c311aeabdc87642e6f6802196110a7c0146f6fb9991
+                    
+
+  /macroblock
+    get:
+      tags:
+        - BitExplorer
+      summary: 'Returns the contents of a macroblock'
       parameters:
-        - name: hash
-          in: query
-          required: true
-          description: 'Macroblock/k-block hash.'
-          example: 0028caa83e2cba8d32e6448130805f168d9348218ce37d7d35993ad050b7952b
-          schema:
-            $ref: '#/components/schemas/Hash'
-      responses:
-        '200':
-          description: Successfully returned macroblock content.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  kblock:
-                    type: object
-                    description: 'K-block content. A macroblock can contain only one k-block.'
+      - in: query
+       name: hash
+        schema:
+          type: string
+        required: true
+        description: 'Macroblock hash'
+        example: 'f79474bce415d76a1c1ec34d844e668a420d95fd5fa9e6f8ff1a576c325b70dd'
+      responses: 
+      '200':
+        description: 'Properties of the macroblock'
+        content:
+          application/json:
+            schema:
+              properties:
+                kblock:
+                  type: object
+                  description: 'K-block content. A macroblock can contain only one k-block'
                     properties:
-                      hash: 
-                        allOf:
-                          - $ref: '#/components/schemas/Hash'
-                          - example: 0028caa83e2cba8d32e6448130805f168d9348218ce37d7d35993ad050b7952b
+                      hash:
+                        type: string
+                        description: 'Kblock hash'
+                        example: 'f79474bce415d76a1c1ec34d844e668a420d95fd5fa9e6f8ff1a576c325b70dd'
                       n:
                         type: integer
-                        description: 'Height of the macroblock.' 
-                        example: 5211
-                      time:
+                        description: 'Kblock height'
+                        example: 223320
+                      time: 
                         type: integer
-                        description: 'K-block publishing time in Unix Time format.' 
-                        example: 1592385962
+                        description: 'Kblock publishing time as a UNIX timestamp'
+                        example: 1651590301
                       publisher:
                         type: string
-                        description: 'Public key of a k-block publisher.' 
-                        example: 034b4875bf08ffd5a4f0b06c21f951aa3e2f979d2d9f1bb4a64e0600eac2350beb
+                        description: 'Public key of a k-block publisher'
+                        example: '03a3a059b05feb9443c9cc352161f1873b97e0dff61c939e77f1923113631cf8ea'
                       nonce:
-                        allOf:
-                          - $ref: '#/components/schemas/Nonce'
-                          - example: 41
+                        type: integer
+                        description: 'Kblock nonce'
+                        example: 1640501849
                       link:
                         type: string
-                        description: 'Previous k-block hash.' 
-                        example: 00fb459c1f8de0b24d074641a76878ab9528acaf62a9a33a0d9874a92e3349b5
-                      sprout:
+                        description: 'Previous k-block's hash'
+                        example: '4eabd6269f205e2b16aeb73102a53c5e1391810d2e985d3cb8c9d993c94dea1a'
+                      sprout: 
                         type: string
-                        description: 'Merkle tree top hash.' 
-                        example: BITGENESIS
+                        description: 'Merkle tree top hash'
+                        example: 'BITGENESIS'
                       m_root:
                         type: string
-                        description: 'Merkle tree root.' 
-                        example: 61b80791bfdd95cf958b3eb21412dc15634f15b5e692e68401abdf9b1d794135
-                      reward:
-                        type: integer
-                        description: 'Reward for k-block mining.' 
-                        example: 15449600000
-                      target_diff:
-                        type: integer
-                        description: 'Hash calculation difficulty.' 
-                        example: 141304204
-                  mblocks:
-                    type: array
-                    description: 'Microblock content. There can be multiple microblocks. In each microblock, there can be multiple transactions.'
-                    items:
-                      type: object
-                      properties:
-                        hash:
-                          $ref: '#/components/schemas/Hash'
-                        tx_cnt:
+                        description: 'Merkle tree root'
+                        example: '3070c01d553ecea1ccdf203604dec36173da353f1ede5918dc88d09f4a96fc4b'
+                      leader_sign:
+                        type: object
+                        description: 'To be clarified'
+                          properties:
+                            type:
+                              type: string
+                              description: 'Leader sign type (TO BE CLARIFIED)'
+                              example: 'Buffer'
+                            data:
+                              type: array
+                              description: 'Leader sign (to be clarified)'
+                              items:
+                                properties:
+                                  type: integer
+                                  description: 'TO BE CLARIFIED (hexadecimal or not?)'
+                                  example: 123
+                        reward: 
                           type: integer
-                          description: 'The amount of transactions in a microblock.'
-                    example:
-                      - hash: bfac67dcb2f2b7a8275f0787c8c98f356b6a51635de61bc981c0eec386453fe7
-                        tx_cnt: 3
-                      - hash: caa23e95b2cd0f11f5713a340309c1148a9519c4178330f03e95a82b612758bb
-                        tx_cnt: 3
-                  sblocks:
-                    type: array
-                    description: 'Statblock content. There can be multiple statblocks.'
-                    items:
-                      type: object
+                          description: 'Reward for k-block mining'
+                          example: 1523000000
+                        target_diff:
+                          type: integer
+                          description: 'Hash calculation difficulty'
+                          example: 0
+                mblocks:
+                  type: array
+                  description: 'Microblock content. There can be multiple microblocks. In each microblock, there can be multiple transactions'
+                  items: 
+                    type: object
+                    properties:
+                      hash:
+                        properties:
+                          type: string
+                          description: 'Mblock hash'
+                      tx_count:
+                        properties:
+                          type: integer
+                          description: 'Count of transactions'
+                  example:
+                    - hash: '270d10646755142b5d79ba121985cb6c73f97f10df4d960474cc7e3c8999cd27'
+                    - tx_count: 3   
+                sblocks:
+                  type: array
+                  description: 'Sblock properties'
+                  items:
+                    type: object 
                       properties:
                         hash:
-                          $ref: '#/components/schemas/Hash'
-                    example:
-                      - hash: 57c5d28b3e82508a873d0c311aeabdc87642e6f6802196110a7c0146f6fb9991
-                    
+                          type: string
+                          description: 'Sblock hash'
+                          example: '8a643dc237d86c948bbed5b9bc6f22366d2be54df7722bbddafbe6597b37db84'
+                snapshot_hash:
+                  type: integer #?
+                  description: 'TO BE CLARIFIED'
+                  example: 'null'                 
+
+
   /macroblock_by_height:
     get:
       tags:
