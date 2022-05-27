@@ -85,21 +85,1479 @@ info:
   
 servers:
   # Added by API Auto Mocking Plugin
+#  - description: SwaggerHub API Auto Mocking
+#    url: https://virtserver.swaggerhub.com/enecuum/BitExplorerAPI/1.0.0
+  # Added by API Auto Mocking Plugin
+#  - description: SwaggerHub API Auto Mocking
+#    url: https://virtserver.swaggerhub.com/enecuum/BitExplorerAPI/1.0.0
+  # Added by API Auto Mocking Plugin
+  # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/enecuum/BitExplorerAPI/1.0.0
   - description: Enecuum BIT Network. New API is first deployed here.
-    url: https://bit.enecuum.com/api/v1
+    url: http://bit.enecuum.com/api/v1/ #bit.enecuum.com/api/v1
   - description: Enecuum Pulse Network (main network). Some API methods may be missing.
     url: https://pulse.enecuum.com/api/v1
-# Added by API Auto Mocking Plugin
-  - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/enecuum/EnecuumNodeAPI/1.0.0
+# Added3 by API Auto Mocking Plugin
+#  - description: SwaggerHub API Auto Mocking
+#    url: https://virtserver.swaggerhub.com/enecuum/EnecuumNodeAPI/1.0.0
   
-paths: 
+paths:
+  /network_info:
+    get:
+      tags:
+        - Network
+      summary: 'Retrieves network information'
+      description: 'Returns network info'
+      responses:
+        '200':
+          description: Successfully returned.
+          content:
+            application/json:
+              schema:
+                properties:
+                  target_speed: 
+                    type: integer
+                    description: desired interval between block release in seconds
+                    example: 15
+                  reward_ratio:
+                    type: object
+                    description: Shares of the native token block reward by node types (10,000 = 100%)   
+                    properties: 
+                      pos: 
+                        type: integer
+                        description: Reward ratio for PoS nodes
+                        example: 5500
+                      poa:
+                         type: integer
+                         description: Reward ratio for PoA nodes
+                         example: 3181
+                      pow:
+                         type: integer
+                         description: Reward ratio for PoW nodes
+                         example: 500
+                      ref:
+                        type: integer
+                        description: Reward ratio for referrals
+                        example: 819
+                  transfer_lock:
+                    type: integer
+                    description: Minimal amount of blocks between undelegation and transfer so that the transfer is valid 
+                    example: 5
+                  pos_min_stake:
+                    type: integer
+                    description: Minimal stake for a PoS node
+                    example: 25000000000
+                  native_token:
+                    type: object
+                    description: Native token properties
+                    properties: 
+                      hash: 
+                        type: string
+                        description: Native token hash
+                        example: 0000000000000000000000000000000000000000000000000000000000000001
+                      owner:
+                        type: string
+                        description: Address of the wallet that created the native token
+                        example: 029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d
+                      fee_type:
+                        type: integer
+                        description: Fee type (see comment below, TO BE CLARIFIED - see comment below)
+                        # 0 - flat fee for owner upon transaction in reward tokens, 1 - percent fee in reward tokens, 2 - native fee, fixed, charged in native tokens)
+                        example: 0
+                      fee_value:
+                        type: integer
+                        description: Fee value
+                        example: 1000000000
+                      ticker:
+                        type: string
+                        description: Native token ticker
+                        example: BIT
+                      decimals:
+                        type: integer
+                        description: Number of decimal places
+                        example: 10
+                      total_supply:
+                        type: string
+                        description: Total supply of native tokens
+                        example: 2455559059822244864
+                      caption:
+                        type: string
+                        description: Token name
+                        example: Enecuum Testnet BIT
+                      active:
+                        type: integer
+                        description: TO BE EXPLAINED
+                        # has something to do with mining slots?
+                        example: 1
+                      reissuable:
+                        type: integer
+                        description: (1 stands for tokens that can be minted and burned?)
+                        example: 0
+                      minable:
+                        type: integer
+                        description: Whether a token can be mined or not
+                        example: 1
+                      max_supply:
+                        type: integer
+                        description: Maximum token supply
+                        example: 3500000000000000000
+                      block_reward:
+                        type: integer
+                        description: Reward for the mining of a block
+                        example: 30460000000
+                      min_stake:
+                        type: integer
+                        description: The minimal stake for a PoA node (applies to mineable tokens only? null for others)
+                        example: 250000000000
+                      referrer_stake:
+                        type: integer
+                        description: TO BE EXPLAINED
+                        example: 10000000000000
+                      ref_share:
+                        type: integer
+                        description: TO BE EXPLAINED
+                        example: 2574
+                      txs_count:
+                        type: integer
+                        description: (TO BE CLARIFIED) amount of transactions with this token
+                        example: 6406044
+                      cg_price_usd:
+                        type: integer
+                        description: CoinGecko price of the token in USDT? (TO BE CLARIFIED)
+                        example: 0.03952753
+                      dex_price_usd:
+                        type: integer
+                        description: Price of the token on pour DEX (ENEX? TO BE CLARIFIED)
+                        example: 0.03952753
+                      price_raw:
+                        type: object
+                        description: a different representation of cg_price_usd and dex_price_usd
+                        properties:
+                          cg_price:
+                            type: integer
+                            description: CoinGecko price, different representation
+                            example: 395275300
+                          dex_price:
+                            type: integer
+                            description: Our DEX price, different representation
+                            example: 395275300
+                          decimals:
+                            type: integer
+                            description: Number of decimal places
+                            example: 10
+                  origin:
+                    type: object
+                    description: TO BE EXPLAINED
+                    properties:
+                      publisher:
+                        type: string
+                        description: TO BE EXPLAINED
+                        example: 029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d
+                      reward:
+                        type: integer
+                        description: TO BE EXPLAINED
+                        example: 2449913938434801029
+                      hash:
+                        type: string
+                        description: TO BE EXPLAINED
+                        example: BITGENESIS
+                      link:
+                        type: string
+                        description: TO BE EXPLAINED
+                        example: BITGENESIS
+                      sprout:
+                        type: string
+                        description: TO BE EXPLAINED
+                        example: BITGENESIS
+                      time:
+                        type: integer
+                        description: TO BE EXPLAINED
+                        example: 0
+                  fee_shares:
+                    type: object
+                    description: TO BE EXPLAINED
+                    properties:
+                      gen_share:
+                        type: integer
+                        description: TO BE EXPLAINED
+                        example: 300
+                      pow_share:
+                        type: integer
+                        description: TO BE EXPLAINED
+                        example: 50
+                      ldr_share:
+                        type: integer
+                        description: TO BE EXPLAINED
+                        example: 50
+                      pos_share:
+                        type: integer
+                        description: TO BE EXPLAINED
+                        example: 9600
+                  MPK:
+                    type: object
+                    description: TO BE EXPLAINED
+                    properties: 
+                      x:
+                        type: integer
+                        description: TO BE EXPLAINED
+                        example: 1 1887977886599394063028178950947279860127724050479032082036805996418912013153131127696715993837524647383570338355695255786360661495991220227612598684883028 3780267397673468252343519622281735554920859525529214838409547998448097213079684300112811104508239777017758612507356636174013439449215588949644233352733139
+                      y: 
+                        type: integer
+                        description: TO BE EXPLAINED
+                        example: 1 607218419856648654813472028821287383397295365990787484847671131205048590195733091420684296247120974745720384180519261046258140424163987254801646299078125 3574484102938033217678888696334982695759754668992496989785966938244090853405896393856377280681069520660874902711918462986779665727013338716276831662950626
+                  mblock_slots:
+                    type: object
+                    description: TO BE EXPLAINED
+                    properties:
+                      size:
+                        type: integer
+                        description: TO BE EXPLAINED
+                        example: 2
+                      count:
+                        type: integer
+                        description: TO BE EXPLAINED
+                        example: 2
+                      min_stake:
+                        type: integer
+                        description: TO BE EXPLAINED - minimal stake
+                        example: 5000000000000000
+                  dex:
+                    type: object
+                    description: TO BE EXPLAINED
+                    properties:
+                      DEX_COMMANDER_ADDRESS:
+                        type: string
+                        description: TO BE EXPLAINED
+                        example: 033333333333333333333333333333333333333333333333333333333333333333
+                      DEX_BURN_ADDRESS:
+                        type: string
+                        description: TO BE EXPLAINED
+                        example: 02dead000000000000000000000000000000000000000000000000000000000000
+                      DEX_ENX_TOKEN_HASH:
+                        type: string
+                        description: TO BE EXPLAINED
+                        example: 824e7b171c01e971337c1b25a055023dd53c003d4aa5aa8b58a503d7c622651e
+                      DEX_SPACE_STATION_ID:
+                        type: string
+                        description: TO BE EXPLAINED
+                        example: 50789932e52d80ff65a56547274498d865ce1d85f14bbacdcd5b575191f87621
+                      DEX_COMMANDER_FEE:
+                        type: integer
+                        description: TO BE EXPLAINED
+                        example: 5
+                      DEX_POOL_FEE:
+                        type: integer
+                        description: TO BE EXPLAINED
+                        example: 30
+                      DEX_TRUSTED_TOKENS:
+                        type: string
+                        description: TO BE EXPLAINED
+                        example: 824e7b171c01e971337c1b25a055023dd53c003d4aa5aa8b58a503d7c622651e
+  /stats:
+    get: 
+      tags: 
+        - Network
+      summary: 'Returns network stats.'
+      description: 'Returns network stats. Check response schema for more details.'
+      responses:
+        '200':
+            description: Successfully returned network stats.
+            content:
+              application/json:
+                schema:
+                  properties:
+                    accounts:
+                      type: integer
+                      description: Number of accounts.
+                      example: 2128
+                    apkUrl:
+                      type: integer
+                      description: URL for the latest version Android Masternode App download.
+                      example: 
+                    block_time_24h_avg:
+                      type: integer
+                      description: Average time in seconds between k-block generation in the last 24 hours.
+                      example: 15
+                    block_time_30d_avg:
+                      type: integer
+                      description: Average time in seconds between k-block generation in the last 30 days.
+                      example: 13
+                    block_time_target:
+                      type: integer
+                      description: Targeted time in seconds between k-block generation.
+                      example: 15
+                    calc_rois:
+                      type: integer
+                      description: The balance the PoA node will have after mining for 24 hours with a *calc_stakes* stake.
+                      example: 250008797842
+                    calc_stakes:
+                      type: integer
+                      description: The stake that is used to calculate *calc_rois*.
+                      example: 250000000000
+                    cashier_ptr:
+                      type: integer
+                      description: Block hash that is used for cashier calculation.
+                      example: 6
+                    cg_btc:
+                      type: number
+                      description: Current ENQ value in BTC based on [CoinGecko](https://www.coingecko.com/en/coins/enecuum).
+                      example: 0.00000122
+                    cg_eth:
+                      type: number
+                      description: Current ENQ value in ETH based on [CoinGecko](https://www.coingecko.com/en/coins/enecuum).
+                      example: 0.00004273
+                    cg_usd:
+                      type: number
+                      description: Current ENQ value in USD based on [CoinGecko](https://www.coingecko.com/en/coins/enecuum).
+                      example: 0.01615963
+                    csup:
+                      type: integer
+                      description: ENQ circulating supply, i.e., the total ENQ supply minus [team wallet](https://pulse.enecuum.com/#!/account/0270a88ea6f7c5ea2a2ec3878008d878a70fd5d4ca27d5866d0eec3594cab0b912/0) and [fund wallet](https://pulse.enecuum.com/#!/account/026df0aa41967d8d47082c36b29a164aa1c90cdd07cb02d373daaba90b8eca5301/0). The returned value is multiplied by 10^10.
+                      example: 3407411488880000000
+                    difficulty:
+                      type: number
+                      description: Mining difficulty.
+                      example: 9.69
+                    engaged_balance:
+                      type: integer
+                      description: Total stakes of PoA and PoS nodes. The returned value is multiplied by 10^10.
+                      example: 3272847385977657300
+                    full_count:
+                      type: integer
+                      description: Number of active Full nodes.
+                      example: 2
+                    height:
+                      $ref: '#/components/schemas/Height'
+                    indexer_ptr:
+                      type: integer
+                      description: Block hash that is used by the explorer.
+                      example: 0
+                    maxApkVersion:
+                      type: integer
+                      description: This is used for auto updating of Enecuum Masternode Android app.
+                      example: 0
+                    max_stake:
+                      type: integer
+                      description: PoA stake threshold. Having greater stake results in no additional rewards. The returned value is multiplied by 10^10.
+                      example: 250000000000000
+                    max_tps:
+                      type: integer
+                      description: Current maximum number of transactions per second. This is NOT the maximum possible TPS for Enecuum.
+                      example: 17
+                    minApkVersion:
+                      type: integer
+                      description: Minimum version of Enecuum Android App required for mining.
+                      example: 0
+                    min_stake:
+                      $ref: '#/components/schemas/MinStake'
+                    network_hashrate:
+                      type: integer
+                      description: Network hashrate in hashes per second.
+                      example: 826
+                    poa_capable_count:
+                      type: integer
+                      description: The number of PoA accounts capable of mining, i.e., with  available balance of at least minimum stake.
+                      example: 2109
+                    poa_count:
+                      type: integer
+                      description: Number of active PoA nodes.
+                      example: 648
+                    pos_active_count:
+                      type: integer
+                      description: Number of PoS contracts that have received rewards in the last X blocks (the value may be different, currently X = 5760).
+                      example: 1
+                    pos_count:
+                      type: integer
+                      description: Number of active PoS nodes.
+                      example: null
+                    pos_total_count:
+                      type: integer
+                      description: Number of all PoS contracts.
+                      example: 23
+                    pow_count:
+                      type: integer
+                      description: Number of active PoW nodes.
+                      example: 1
+                    proposed_inflation:
+                      type: integer
+                      description: Proposed inflation calculated as yearly rewards divided by total supply.
+                      example: 0
+                    referrer_stake:
+                      $ref: '#/components/schemas/ReferrerStake'
+                    reward_poa:
+                      type: integer
+                      description: Rewards received by PoA nodes in the last 24 hours. The returned value is multiplied by 10^10.
+                      example: 1016375584599730
+                    reward_pos:
+                      type: integer
+                      description: Rewards received by PoS nodes in the last 24 hours. The returned value is multiplied by 10^10.
+                      example: 291775352000000
+                    reward_pow:
+                      type: integer
+                      description: Rewards received by PoW nodes in the last 24 hours. The returned value is multiplied by 10^10.
+                      example: 26525032000000
+                    total_daily_pos_stake:
+                      type: integer
+                      description: TODO.
+                      example: 0
+                    total_daily_stake:
+                      type: integer
+                      description: Total PoA nodes stake. The returned value is multiplied by 10^10.
+                      example: 3272841444722907600
+                    tps:
+                      type: integer
+                      description: Transactions per second.
+                      example: 0
+                    tsup:
+                      type: integer
+                      description: ENQ total supply. The returned value is multiplied by 10^10.
+                      example: 1901936042160000000
+                    txfee_daily_30d_avg:
+                      type: integer
+                      description: Average transaction fees in the last 30 days.
+                      example: 28560
+                    txfee_hourly_24h_avg:
+                      type: integer
+                      description: Average transaction fees in the last 24 hours.
+                      example: 2071
+
+  /tps: 
+    get:
+      tags:
+        - Network
+      summary: 'Returns TPS (transactions per second) value'
+      responses:
+        '200':
+          description: Successfully returned.
+          content:
+            application/json:
+              schema:
+                properties:
+                  tps:
+                    type: integer
+                    description: 'Average rounded aount of transactions during the last 300 seconds'
+                    example: 1
+
+  /get_tokens_count:
+    get:
+      tags:
+        - Network
+      summary: 'Returns the number of tokens deployed on the network and the breakdown of those tokens by type.'
+      responses:
+        '200':
+          description: 'The number of tokens and their breakdown by type.'
+          content:
+            application/json:
+              schema:
+                properties:
+                  count:
+                    type: integer
+                    description: 'The total number of tokens deployed on the network.'
+                    example: 1427
+                  non_reissuable:
+                    type: integer
+                    description: 'The number of non-reissuable tokens.'
+                    example: 873
+                  reissuable:
+                    type: integer
+                    description: 'The number of reissuable tokens.'
+                    example: 279
+                  minable:
+                    type: integer
+                    description: 'The number of minable tokens.'
+                    example: 275
+
+  /get_token_holder_count:
+    get:
+      tags:
+        - Network
+      summary: 'Returns the amount of accounts that hold the specified token. If no token is specified, it returns the amount of accounts that hold the native token (BIT)'
+      parameters:
+        - in: query
+          name: hash
+          required: false
+          description: 'Token hash.'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The amount of token holders.
+          content:
+            application/json:
+              schema:
+                properties:
+                  count:
+                    type: integer
+                    description: 'The amount of token holding accounts'
+                    example: 34676
+
+  /get_tickers_all: 
+    get:
+      tags:
+        - Network
+      summary: 'Returns the list of all token tickers on the network, including token hashes and captions.'
+      responses:
+        '200':
+          description: 'The list of all token tickers on the network, including token hashes and captions.'
+          content:
+            application/json:
+              schema:
+                properties:
+                  hash:
+                    type: string
+                    description: 'Token hash.'
+                    example: 0000000000000000000000000000000000000000000000000000000000000001
+                  ticker:
+                    type: string
+                    description: 'Token ticker.'
+                    example: BIT
+                  caption:
+                    type: string
+                    description: 'Token caption (long name).'
+                    example: Enecuum testnet BIT
+  /get_transfer_lock:
+    get:
+      tags: 
+        - Network
+      summary: 'Returns asset lock duration.'
+      description: 'Returns asset lock duration.' #TODO: elaborate
+      responses:
+        '200':
+          description: Successfully returned transfer lock.
+          content:
+            application/json:
+             schema:
+              properties:
+                transfer_lock:
+                  type: integer
+                  description: Transfer lock duration. #TODO: elaborate
+                  example: 5
+  /peer_map:
+    get:
+      tags:
+        - Network
+      summary: 'Returns the map of peer nodes on the blockchain'
+      description: 'Returns a breakdown of peer nodes by location'
+      responses:
+        '200':
+          description: Peer node properties
+          content:
+           application/json:
+            schema:
+              type: array
+              description: Peer info by location
+              items:
+                type: object
+                properties:
+                  type: 
+                    type: integer
+                    description: 'Peer type.' # (to be expanded)
+                    example: 2
+                  city:
+                    type: string
+                    description: 'City where the peers are based'
+                    example: 'Beverwijk'
+                  lat:
+                    type: number
+                    description: 'Latitude of the city where the peers is based'
+                    example: 52.4847
+                  lon:
+                    type: number
+                    description: 'Longitude of the city where the peers are based'
+                    example: 4.6543
+                  count: 
+                    type: integer
+                    description: 'Total count of nodes based in the city'
+                    example: 10   
+  /height:
+    get:
+      tags:
+        - Network
+      summary: 'Returns blockchain height.'
+      description: 'Returns the last block number, i.e., the total number of blocks in the blockchain. The block count starts with 0.'
+      responses:
+        '200':
+            description: Successfully returned block height.
+            content:
+              application/json:
+                schema:
+                  properties:
+                    height:
+                      $ref: '#/components/schemas/Height'
+  /difficulty:
+    get:
+      tags:
+        - Network
+      summary: 'Returns block mining difficulty.'
+      description: 'Returns block mining difficulty.'
+      responses:
+        '200':
+            description: Successfully returns mining difficulty.
+            content:
+              application/json:
+                schema:
+                  properties:
+                    difficulty:
+                      type: number
+                      format: float
+                      description: 'Block mining difficulty'
+                      example: 0.00
+
+  /ext/plain/hashrate:
+    get:
+      tags:
+        - Network
+      summary:  'Returns blockchain hash rate.'
+      description: 'Returns blockchain hash rate.'
+      responses:
+        '200':
+          description: 'Successfully returns blockchain hash rate.'
+          content:
+            application/json:
+              schema:
+                properties:
+                  hashrate:
+                    type: number
+                    description: 'Blockchain hash rate.'
+                    example: 2.0139111001134378
+  /native_token:
+    get:
+      tags: 
+        - Token
+      summary: 'Returns token info about the native token of the network.'
+      responses:
+        '200':
+          description: Token info.
+          content:
+            application/json:
+              schema:
+                properties: 
+                  hash: 
+                    type: string
+                    description: Token hash
+                    example: '0000000000000000000000000000000000000000000000000000000000000001'
+                  owner:
+                    type: string
+                    description: Address of the account that created the token
+                    example: 029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d
+                  fee_type:
+                    type: integer
+                    description: Fee type (see comment below, TO BE CLARIFIED - see comment below)
+                    # 0 - flat fee for owner upon transaction in reward tokens, 1 - percent fee in reward tokens, 2 - native fee, fixed, charged in native tokens)
+                    example: 0
+                  fee_value:
+                    type: integer
+                    description: Fee value
+                    example: 1000000000
+                  fee_min:
+                    type: integer
+                    description: Minimal fee
+                    example: 1000000000
+                  ticker:
+                        type: string
+                        description: Token ticker
+                        example: BIT
+                  decimals:
+                    type: integer
+                    description: Number of decimal places
+                    example: 10
+                  total_supply:
+                    type: string
+                    description: Total supply of the token
+                    example: 2455559059822244864
+                  caption:
+                    type: string
+                    description: Long token name
+                    example: Enecuum Testnet BIT
+                  active:
+                    type: integer
+                    description: TO BE EXPLAINED
+                    # has something to do with mining slots?
+                    example: 0
+                  reissuable:
+                    type: integer
+                    description: Indicates whether the token is reissuable (can be minted and burned)
+                    example: 0
+                  minable:
+                    type: integer
+                    description: Indicates whether a token can be mined
+                    example: 1
+                  max_supply:
+                    type: integer
+                    description: Maximum token supply
+                    example: 3500000000000000000
+                  block_reward:
+                    type: integer
+                    description: Reward for the mining of a block
+                    example: 30460000000
+                  min_stake:
+                    type: integer
+                    description: Minimal stake for a PoS node
+                    example: 250000000000
+                  referrer_stake:
+                    type: integer
+                    description: TO BE EXPLAINED
+                    example: 10000000000000
+                  ref_share:
+                    type: integer
+                    description: TO BE EXPLAINED
+                    example: 2574
+                  txs_count:
+                    type: integer
+                    description: (TO BE CLARIFIED) Amount of transactions with this token
+                    example: 6406044
+                  cg_price_usd:
+                    type: integer
+                    description: CoinGecko price of the token in USD (TO BE CLARIFIED)
+                    example: 0.03952753
+                  dex_price_usd:
+                    type: integer
+                    description: Price of the token on pour DEX (ENEX? TO BE CLARIFIED)
+                    example: 0.03952753
+                  price_raw:
+                    type: object
+                    description: another ("raw", without decimal point) representation of cg_price_usd and dex_price_usd
+                    properties:
+                      cg_price:
+                        type: integer
+                        description: CoinGecko price, different representation
+                        example: 395275300
+                      dex_price:
+                        type: integer
+                        description: Our DEX price, different representation
+                        example: 395275300
+                      decimals:
+                        type: integer
+                        description: Number of decimal places
+                        example: 10
+
+  /token_info:
+    get: 
+      tags: 
+        - Token
+      summary: 'Returns information about the token.'
+      description: 'Returns general information about the token. Multiple examples of possible responses can be chosen below. The description of the response can be found in the response schema.'
+      parameters: 
+        - name: hash
+          in: query
+          required: true
+          description: 'Token hash.'
+          schema:
+            $ref: '#/components/schemas/Token'
+      responses:
+        '200':
+            description: Successfully returned token info.
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      hash:
+                        $ref: '#/components/schemas/Token'
+                      owner:
+                        $ref: '#/components/schemas/Owner'
+                      fee_type:
+                        type: integer
+                        description: |
+                          One of the following fee types is possible:
+                          - 0 means flat fee;
+                          - 1 means percent fee.
+                        enum: [0,1]
+                        example: 0
+                      fee_value:
+                        type: integer
+                        description: For flat fee, the fee amount is multiplied by 10^*d*, where *d* stands for the number of decimal places. For percent fee, the fee amount is multiplied by 100.
+                        example: 10000000000
+                      fee_min:
+                        type: integer
+                        description: The minimum flat fee in case the token uses percent fee. 
+                        example: 10000000000
+                      ticker:
+                        $ref: '#/components/schemas/Ticker'
+                      decimals:
+                        $ref: '#/components/schemas/Decimals'
+                      total_supply:
+                        type: integer
+                        description: The token emission. The amount is multiplied by 10^*d*, where *d* stands for the number of decimal places. 
+                        example: 5010637449999934464
+                      caption:
+                        type: string
+                        description: A 0-40 character token description. Can be empty.
+                        example: mining token 2
+                      active:
+                        type: integer
+                        description: |
+                          One of the following statuses is possible:
+                          - 0 means inactive;
+                          - 1 means active.
+                        enum: [0,1]
+                        example: 1
+                      reissuable:
+                        $ref: '#/components/schemas/Reissuable'
+                      minable:
+                        $ref: '#/components/schemas/Minable'
+                      max_supply:
+                        type: integer
+                        description: A maximum token emission. Upon reaching this number, the token can no longer be mined.
+                        example: 10000000000000000000
+                      block_reward:
+                        type: integer
+                        description: A reward for each mined macroblock. This number includes the referral reward.
+                        example: 50000000000
+                      min_stake:
+                        $ref: '#/components/schemas/MinStake'
+                      referrer_stake:
+                        $ref: '#/components/schemas/ReferrerStake'
+                      ref_share:
+                        type: integer
+                        description: A share of the total block reward that determines the referral reward amount. The referral reward is distributed among the referral and their agent equally
+                        example: 1000
+                      txs_count:
+                        type: integer
+                        description: The number of transactions with this token (within which timeframe?)
+                        example: 1
+                      cg_price_usd:
+                        type: integer
+                        description: CoinGecko price of the token
+                        example: null
+                      dex_price_usd:
+                        type: integer
+                        description: Price of the token on pour DEX (ENEX? TO BE CLARIFIED)
+                        example: 0.0361261927
+                      price_raw:
+                        type: object
+                        description: another ("raw", without decimal point) representation of cg_price_usd and dex_price_usd
+                        properties:
+                          cg_price:
+                            type: integer
+                            description: CoinGecko price, different representation
+                            example: null
+                          dex_price:
+                            type: integer
+                            description: Our DEX price, different representation
+                            example: 361261927
+                          decimals:
+                            type: integer
+                            description: Number of decimal places
+                            example: 10
+                examples:
+                  reissuable:
+                    description: Tokens with a flexible supply. After the token release, its supply can be changed by issuing or burning of coins.
+                    value:
+                      - hash: "0000000000000000000000000000000000000000000000000000000000000000"
+                        owner: 029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d
+                        fee_type: 0
+                        fee_value: 100000000
+                        fee_min: 0
+                        ticker: BIT
+                        decimals: 10
+                        total_supply: 3493999410335106560
+                        caption: Enecuum testnet BIT
+                        active: 0
+                        reissuable: 1
+                        minable: 0
+                        max_supply: null
+                        block_reward: null
+                        min_stake: null
+                        referrer_stake: null
+                        ref_share: null
+                  non-reissuable:
+                    description: Tokens with a fixed supply. After the token release, extra token coins can not be emitted.
+                    value:
+                      - hash: "0000000000000000000000000000000000000000000000000000000000000000"
+                        owner: 029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d
+                        fee_type: 0
+                        fee_value: 100000000
+                        fee_min: 0
+                        ticker: BIT
+                        decimals: 10
+                        total_supply: 3493999410335106560
+                        caption: Enecuum testnet BIT
+                        active: 0
+                        reissuable: 0
+                        minable: 0
+                        max_supply: null
+                        block_reward: null
+                        min_stake: null
+                        referrer_stake: null
+                        ref_share: null
+                  mineable:
+                    description: Tokens that can be mined. Some volume is selected for instant release (pre-mine), and the rest is mined by users.
+                    value:
+                      - hash: "0000000000000000000000000000000000000000000000000000000000000000"
+                        owner: 029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d
+                        fee_type: 0
+                        fee_value: 100000000
+                        fee_min: 0
+                        ticker: BIT
+                        decimals: 10
+                        total_supply: 3493999410335106560
+                        caption: Enecuum testnet BIT
+                        active: 0
+                        reissuable: 0
+                        minable: 1
+                        max_supply: 9000000000000000000
+                        block_reward: 96560000000
+                        min_stake: 250000000000
+                        referrer_stake: 10000000000000
+                        ref_share: 1000
+
+  /get_token_info_page:
+    get:
+      tags:
+        - Token
+      summary: 'Returns the properties of the tokens listed on a specific BIT Explorer page. If no page number is specified, the amount of tokens to be displayed on a page and the total number of token info pages are returned.'
+      # I really don't know whether the output should include ALL ten tokens listed on a page - to be clarified!
+      parameters:
+        - in: query
+          name: page
+          required: false
+          description: 'Page number.'
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Properties of the tokens listed on the specified page. 
+          content:
+            application/json:
+              schema:
+                properties: 
+                  hash: 
+                    type: string
+                    description: Token hash
+                    example: '0000000000000000000000000000000000000000000000000000000000000001'
+                  owner:
+                    type: string
+                    description: Address of the account that created the token
+                    example: '029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d'
+                  fee_type:
+                    type: integer
+                    enum: [0,1,2]
+                    description: Fee type |
+                      0 - flat fee for owner upon transaction in reward tokens
+                      1 - percentage fee in reward tokens
+                      2 - fixed fee, charged in native tokens
+#                    (see comment below, TO BE CLARIFIED - see comment below)
+                    # 0 - flat fee for owner upon transaction in reward tokens, 1 - percentage fee in reward tokens, 2 - fixed fee, charged in native tokens)
+                    example: 0
+                  fee_value:
+                    type: integer
+                    description: Fee value
+                    example: 1000000000
+                  fee_min:
+                    type: integer
+                    description: Minimal fee
+                    example: 1000000000
+                  ticker:
+                    type: string
+                    description: Token ticker
+                    example: BIT
+                  decimals:
+                    type: integer
+                    description: Number of decimal places
+                    example: 10
+                  total_supply:
+                    type: string
+                    description: Total supply of the token
+                    example: 2455559059822244864
+                  caption:
+                    type: string
+                    description: Long token name
+                    example: Enecuum Testnet BIT
+                  active:
+                    type: integer
+                    enum: [0,1]
+                    description: TO BE EXPLAINED (something to do with mining slots?)
+                    example: 0
+                  reissuable:
+                    type: integer
+                    enum: [0,1]
+                    description: Indicates whether the token is reissuable (can be minted and burned)
+                    example: 0
+                  minable:
+                    type: integer
+                    enum: [0,1]
+                    description: Indicates whether a token can be mined
+                    example: 1
+                  max_supply:
+                    type: integer
+                    description: Maximum token supply
+                    example: 3500000000000000000
+                  block_reward:
+                    type: integer
+                    description: Reward for the mining of a block
+                    example: 30460000000
+                  min_stake:
+                    type: integer
+                    description: Minimal stake for a PoA node (apples if the token is mineable) 
+                    example: 250000000000
+                  referrer_stake:
+                    type: integer
+                    description: TO BE EXPLAINED
+                    example: 10000000000000
+                  ref_share:
+                    type: integer
+                    description: TO BE EXPLAINED
+                    example: 2574
+                  txs_count:
+                    type: integer
+                    description: (TO BE CLARIFIED) Amount of transactions with this token
+                    example: 6406044
+                  in_slot:
+                    type: integer
+                    description: Describes whether the token is in the (current) mining slot (TO BE CLARIFIED)
+                    example: 0
+                  cg_price_usd:
+                    type: integer
+                    description: CoinGecko price of the token in USD (TO BE CLARIFIED)
+                    example: 0.03952753
+                  dex_price_usd:
+                    type: integer
+                    description: Price of the token on pour DEX (ENEX? TO BE CLARIFIED)
+                    example: 0.03952753
+                  price_raw:
+                    type: object
+                    description: another ("raw", without decimal point) representation of cg_price_usd and dex_price_usd
+                    properties:
+                      cg_price:
+                        type: integer
+                        description: CoinGecko price, different representation
+                        example: 395275300
+                      dex_price:
+                        type: integer
+                        description: Our DEX price, different representation
+                        example: 395275300
+                      decimals:
+                        type: integer
+                        description: Number of decimal places
+                        example: 10
+
+                        
+  /get_tokens_by_owner:
+    get:
+      tags: 
+        - Token
+      summary: 'Returns tokens by owner.'
+      description: 'Returns a list of tokens of the specified wallet.'
+      parameters: 
+        - name: owner
+          in: query
+          required: true
+          description: 'Token owner address.'
+          schema:
+            $ref: '#/components/schemas/Owner'
+      responses:
+        '200':
+            description: Successfully returned a list of tokens by owner.
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      token_hash:
+                        $ref: '#/components/schemas/Token'
+                      total_supply:
+                        type: integer
+                        description: A token supply at the time of the issue. 
+                        example: 9510000000000
+                      fee_type:
+                        type: integer
+                        description: Determines whether the fee is fixed or percentage. 0 means fixed, 1 means percentage. 
+                        example: 0
+                      fee_value:
+                        type: integer
+                        description: An exact fee amount for token transactions. If the fee is fixed, the value is multiplied by 10^*d*, where *d* stands for the number of decimal places. If the fee is percentage, the value is multiplied by 100 (e.g. a 1% fee is returned as 100). 
+                        example: 10000000000
+                      fee_min:
+                        type: integer
+                        description: A minimum fee for token transactions if the token type is percentage. For fixed fees, fee_min equals fee_value.
+                        example: 10000000000
+                      reissuable:
+                        $ref: '#/components/schemas/Reissuable'
+                      minable:
+                        $ref: '#/components/schemas/Minable'
+
+  /macroblock:
+    get:
+      tags:
+        - Block
+      summary: 'Returns macroblock info by its hash.'
+      description: 'Returns k-block, microblocks and s-blocks attached to it. Microblock hashes are sorted lexicographically in hexadecimal format.'
+      parameters:
+        - name: hash
+          in: query
+          required: true
+          description: 'Macroblock (k-block) hash'
+          schema:
+            type: string
+            example: '8f92f307503fe2877415b8d1818765aa6ab3196a26abc453f99f72173d0c8c8b'
+      responses:
+        '200':
+          description: Successfully returned macroblock content.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  kblock:
+                    type: object
+                    description: 'K-block content. A macroblock can contain only one k-block.'
+                    properties:
+                      hash: 
+                        allOf:
+                          - $ref: '#/components/schemas/Hash'
+                          - example: 0028caa83e2cba8d32e6448130805f168d9348218ce37d7d35993ad050b7952b
+                      n:
+                        type: integer
+                        description: 'Height of the macroblock.' 
+                        example: 5211
+                      time:
+                        type: integer
+                        description: 'K-block publishing time in Unix Time format.' 
+                        example: 1592385962
+                      publisher:
+                        type: string
+                        description: 'Public key of a k-block publisher.' 
+                        example: 034b4875bf08ffd5a4f0b06c21f951aa3e2f979d2d9f1bb4a64e0600eac2350beb
+                      nonce:
+                        allOf:
+                          - $ref: '#/components/schemas/Nonce'
+                          - example: 41
+                      link:
+                        type: string
+                        description: 'Previous k-block hash.' 
+                        example: 00fb459c1f8de0b24d074641a76878ab9528acaf62a9a33a0d9874a92e3349b5
+                      sprout:
+                        type: string
+                        description: 'Merkle tree top hash.' 
+                        example: BITGENESIS
+                      m_root:
+                        type: string
+                        description: 'Merkle tree root.' 
+                        example: 61b80791bfdd95cf958b3eb21412dc15634f15b5e692e68401abdf9b1d794135
+                      reward:
+                        type: integer
+                        description: 'Reward for k-block mining.' 
+                        example: 15449600000
+                      target_diff:
+                        type: integer
+                        description: 'Hash calculation difficulty.' 
+                        example: 141304204
+                  mblocks:
+                    type: array
+                    description: 'Microblock content. There can be multiple microblocks. In each microblock, there can be multiple transactions.'
+                    items:
+                      type: object
+                      properties:
+                        hash:
+                          $ref: '#/components/schemas/Hash'
+                        tx_cnt:
+                          type: integer
+                          description: 'The amount of transactions in a microblock.'
+                    example:
+                      - hash: bfac67dcb2f2b7a8275f0787c8c98f356b6a51635de61bc981c0eec386453fe7
+                        tx_cnt: 3
+                      - hash: caa23e95b2cd0f11f5713a340309c1148a9519c4178330f03e95a82b612758bb
+                        tx_cnt: 3
+                  sblocks:
+                    type: array
+                    description: 'Statblock content. There can be multiple statblocks.'
+                    items:
+                      type: object
+                      properties:
+                        hash:
+                          $ref: '#/components/schemas/Hash'
+                    example:
+                      - hash: 57c5d28b3e82508a873d0c311aeabdc87642e6f6802196110a7c0146f6fb9991   
+
+  /macroblock_by_height:
+    get:
+      tags:
+        - Block
+      summary: 'Returns macroblock info by its height.'
+      description: 'Returns k-block, microblocks and s-blocks attached to it. Microblock hashes are sorted lexicographically in hexadecimal format.'
+      parameters:
+        - name: height
+          in: query
+          required: true
+          description: 'Block number (height)'
+          schema:
+            type: integer
+            example: 5211
+      responses:
+        '200':
+          description: Successfully returned macroblock content.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  kblock:
+                    type: object
+                    description: 'K-block content. A macroblock can contain only one k-block.'
+                    properties:
+                      hash: 
+                        allOf:
+                          - $ref: '#/components/schemas/Hash'
+                          - example: 0028caa83e2cba8d32e6448130805f168d9348218ce37d7d35993ad050b7952b
+                      n:
+                        type: integer
+                        description: 'Height of the macroblock.' 
+                        example: 5211
+                      time:
+                        type: integer
+                        description: 'K-block publishing time in Unix Time format.' 
+                        example: 1592385962
+                      publisher:
+                        type: string
+                        description: 'Public key of a k-block publisher.' 
+                        example: 034b4875bf08ffd5a4f0b06c21f951aa3e2f979d2d9f1bb4a64e0600eac2350beb
+                      nonce:
+                        allOf:
+                          - $ref: '#/components/schemas/Nonce'
+                          - example: 41
+                      link:
+                        type: string
+                        description: 'Previous k-block hash.' 
+                        example: 00fb459c1f8de0b24d074641a76878ab9528acaf62a9a33a0d9874a92e3349b5
+                      sprout:
+                        type: string
+                        description: 'Merkle tree top hash.' 
+                        example: BITGENESIS
+                      m_root:
+                        type: string
+                        description: 'Merkle tree root.' 
+                        example: 61b80791bfdd95cf958b3eb21412dc15634f15b5e692e68401abdf9b1d794135
+                      reward:
+                        type: integer
+                        description: 'Reward for k-block mining.' 
+                        example: 15449600000
+                      target_diff:
+                        type: integer
+                        description: 'Hash calculation difficulty.' 
+                        example: 141304204
+                  mblocks:
+                    type: array
+                    description: 'Microblock content. There can be multiple microblocks. In each microblock, there can be multiple transactions.'
+                    items:
+                      type: object
+                      properties:
+                        hash:
+                          $ref: '#/components/schemas/Hash'
+                        tx_cnt:
+                          type: integer
+                          description: 'The amount of transactions in a microblock.'
+                    example:
+                      - hash: bfac67dcb2f2b7a8275f0787c8c98f356b6a51635de61bc981c0eec386453fe7
+                        tx_cnt: 3
+                      - hash: caa23e95b2cd0f11f5713a340309c1148a9519c4178330f03e95a82b612758bb
+                        tx_cnt: 3
+                  sblocks:
+                    type: array
+                    description: 'Statblock content. There can be multiple statblocks.'
+                    items:
+                      type: object
+                      properties:
+                        hash:
+                          $ref: '#/components/schemas/Hash'
+                    example:
+                      - hash: 57c5d28b3e82508a873d0c311aeabdc87642e6f6802196110a7c0146f6fb9991   
+
+
+  /mblock:
+    get:
+      tags: 
+        - Block
+      summary: 'Returns contents of a microblock.'
+      description: 'Returns microblock transactions and header. A microblock is a part of a macroblock. Microblocks contain transactions, which are sorted lexicographically by hexadecimal hash.'
+      parameters: 
+        - name: hash
+          in: query
+          required: true
+          description: 'Microblock hash.'
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Hash'
+              - example: 9508e1b33a7ed92dc8c37a08c6ecbba22cc38af3e33bf57dc0af0fa808f27d46
+      responses:
+        '200':
+          description: Successfully returned microblock contents.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transactions:
+                    type: array
+                    description: 'Transaction content. There can be multiple transactions.'
+                    items:
+                      type: object
+                      properties:
+                        hash:
+                          $ref: '#/components/schemas/Hash'
+                        from:
+                          $ref: '#/components/schemas/From'
+                        to:
+                          $ref: '#/components/schemas/To'
+                        amount:
+                          $ref: '#/components/schemas/Amount'
+                        mblocks_hash:
+                          type: string
+                          description: M-block hash. M-blocks contain transactions.
+                          example: a0477381285cdb1815cb7bb939baf9bd1785c76792be82d7a310818189ff9dbd
+                        nonce:
+                          $ref: '#/components/schemas/Nonce'
+                        status:
+                          $ref: '#/components/schemas/Status'
+                        sign:
+                          $ref: '#/components/schemas/Sign'
+                        ticker:
+                          $ref: '#/components/schemas/Token' 
+                        data:
+                          $ref: '#/components/schemas/Data'
+                  header:
+                    type: object
+                    description: 'Microblock header.'
+                    properties:
+                      kblocks_hash: 
+                        allOf:
+                          - $ref: '#/components/schemas/Hash'
+                          - example: 007bbe8c1256915d5ebdc51ff9cec9792d79b2d533832e5fe203129cb949360f
+                      publisher:
+                        type: string
+                        description: 'Public key of a k-block publisher.' 
+                        example: 034b4875bf08ffd5a4f0b06c21f951aa3e2f979d2d9f1bb4a64e0600eac2350beb
+                      referrer:
+                        type: string
+                        description: 'Public key of a referrer. Can be null.' 
+                        nullable: true
+                        example: null
+                      mblocks_hash:
+                        allOf:
+                          - $ref: '#/components/schemas/Hash'
+                          - example: fb263c111d0b07afb2fb0125f7e1b48060d4b24eaeef83afed9d570b5cbc0f09
+                      reward:
+                        type: integer
+                        description: 'A reward for the microblock publication.' 
+                        example: 4387962285
+                      nonce:
+                        $ref: '#/components/schemas/Nonce'
+                      token:
+                        $ref: '#/components/schemas/Token'
+
+# /mblocks - QUITE MYSTERIOUS, check Explorer.JS line 468 and onwards
+
+  /sblock:
+    get:
+      tags: 
+        - Block
+      summary: 'Returns contents of a statblock.'
+      description: 'Returns statblock header. A statblock is a part of a macroblock.'
+      parameters: 
+        - name: hash
+          in: query
+          required: true
+          description: 'Statblock hash.'
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Hash'
+              - example: f6503f7f6388e53a0284f641c1872b61b62bcec3adb5420d430c2676455d4c2b
+      responses:
+        '200':
+            description: Successfully returned statblock contents.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    header:
+                      type: object
+                      properties:
+                        kblocks_hash: 
+                          allOf:
+                            - $ref: '#/components/schemas/Hash'
+                            - example: 007bbe8c1256915d5ebdc51ff9cec9792d79b2d533832e5fe203129cb949360f
+                        publisher:
+                          type: string
+                          description: 'Public key of a k-block publisher.' 
+                          example: 034b4875bf08ffd5a4f0b06c21f951aa3e2f979d2d9f1bb4a64e0600eac2350beb
+                        sblocks_hash:
+                          $ref: '#/components/schemas/Hash'
+                        reward:
+                          type: integer
+                          description: 'A reward for the statblock publication.' 
+                          example: 4387962285
+                        
+# /lastblocks on page - TO BE ADDED
+
+### ACCOUNT INFO (all to be added!!!)
+
+### BALANCE
+
+  /balance:
+    get:
+      tags: 
+        - Balance
+      summary: 'Returns wallet balance.'
+      description: 'Returns the token amount held on the specified wallet address if the address exists. If no token is specified, returns ENQ.'
+      parameters: 
+        - name: id
+          in: query
+          required: true
+          description: The wallet address (public key). 
+          schema:
+            type: string
+            example: 029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d
+        - name: token
+          in: query
+          required: false
+          description: 'Token hash.'
+          schema:
+            $ref: '#/components/schemas/Token'
+      responses:
+        '200':
+          description: Successfully returned wallet balance.
+          content:
+            application/json:
+             schema:
+              properties:
+                amount:
+                  $ref: '#/components/schemas/Amount'
+                token:
+                  $ref: '#/components/schemas/Token'
+                ticker:
+                  $ref: '#/components/schemas/Ticker'
+                decimals:
+                  $ref: '#/components/schemas/Decimals'
+                delegated:
+                  type: integer
+                  description: The number of delegated (lent) coins. #TODO: elaborate
+                  example: 0
+                transit:
+                  type: integer
+                  description: The number of coins for transit. #TODO: elaborate
+                  example: 0
+                undelegated:
+                  type: integer
+                  description: The number of undelegated coins. #TODO: elaborate
+                  example: 0
+                reward:
+                  type: integer
+                  description: The number of earned coins. #TODO: elaborate
+                  example: 0
+
+
+### TRANSACTIONS
+
   /tx:
     post:
       tags: 
-        - General
+        - Transactions
       summary: 'Performs transaction.'
       description: |
         Performes transaction using the request body. After performing the transaction, its status can be checked with the GET /tx method. In the response body, you can view both successful and unsuccessful results. Click "success" or "error" to access them.
@@ -595,7 +2053,7 @@ paths:
           
     get:
       tags: 
-        - General
+        - Transactions
       summary: 'Returns transaction status.'
       description: |
         Checks the status of the performed transaction. Additionally, returns the related k-block and m-block hashes. K-blocks and m-blocks are a part of the blockchain architecture. 
@@ -644,880 +2102,19 @@ paths:
                       type: string
                       description: M-block hash. M-blocks contain transactions.
                       example: a0477381285cdb1815cb7bb939baf9bd1785c76792be82d7a310818189ff9dbd
-  /balance:
-    get:
-      tags: 
-        - General
-      summary: 'Returns wallet balance.'
-      description: 'Returns the token amount held on the specified wallet address if the address exists. If no token is specified, returns ENQ.'
-      parameters: 
-        - name: id
-          in: query
-          required: true
-          description: The wallet address (public key). 
-          schema:
-            type: string
-            example: 029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d
-        - name: token
-          in: query
-          required: false
-          description: 'Token hash.'
-          schema:
-            $ref: '#/components/schemas/Token'
-      responses:
-        '200':
-          description: Successfully returned wallet balance.
-          content:
-            application/json:
-             schema:
-              properties:
-                amount:
-                  $ref: '#/components/schemas/Amount'
-                token:
-                  $ref: '#/components/schemas/Token'
-                ticker:
-                  $ref: '#/components/schemas/Ticker'
-                decimals:
-                  $ref: '#/components/schemas/Decimals'
-                delegated:
-                  type: integer
-                  description: The number of delegated (lent) coins. #TODO: elaborate
-                  example: 0
-                transit:
-                  type: integer
-                  description: The number of coins for transit. #TODO: elaborate
-                  example: 0
-                undelegated:
-                  type: integer
-                  description: The number of undelegated coins. #TODO: elaborate
-                  example: 0
-                reward:
-                  type: integer
-                  description: The number of earned coins. #TODO: elaborate
-                  example: 0
-          
-  /stats:
-    get: 
-      tags: 
-        - General
-      summary: 'Returns network stats.'
-      description: 'Returns network stats. Check response schema for more details.'
-      responses:
-        '200':
-            description: Successfully returned network stats.
-            content:
-              application/json:
-                schema:
-                  properties:
-                    accounts:
-                      type: integer
-                      description: Number of accounts.
-                      example: 2128
-                    apkUrl:
-                      type: integer
-                      description: URL for the latest version Android Masternode App download.
-                      example: 
-                    block_time_24h_avg:
-                      type: integer
-                      description: Average time in seconds between k-block generation in the last 24 hours.
-                      example: 15
-                    block_time_30d_avg:
-                      type: integer
-                      description: Average time in seconds between k-block generation in the last 30 days.
-                      example: 13
-                    block_time_target:
-                      type: integer
-                      description: Targeted time in seconds between k-block generation.
-                      example: 15
-                    calc_rois:
-                      type: integer
-                      description: The balance the PoA node will have after mining for 24 hours with a *calc_stakes* stake.
-                      example: 250008797842
-                    calc_stakes:
-                      type: integer
-                      description: The stake that is used to calculate *calc_rois*.
-                      example: 250000000000
-                    cashier_ptr:
-                      type: integer
-                      description: Block hash that is used for cashier calculation.
-                      example: 6
-                    cg_btc:
-                      type: number
-                      description: Current ENQ value in BTC based on [CoinGecko](https://www.coingecko.com/en/coins/enecuum).
-                      example: 0.00000122
-                    cg_eth:
-                      type: number
-                      description: Current ENQ value in ETH based on [CoinGecko](https://www.coingecko.com/en/coins/enecuum).
-                      example: 0.00004273
-                    cg_usd:
-                      type: number
-                      description: Current ENQ value in USD based on [CoinGecko](https://www.coingecko.com/en/coins/enecuum).
-                      example: 0.01615963
-                    csup:
-                      type: integer
-                      description: ENQ circulating supply, i.e., the total ENQ supply minus [team wallet](https://pulse.enecuum.com/#!/account/0270a88ea6f7c5ea2a2ec3878008d878a70fd5d4ca27d5866d0eec3594cab0b912/0) and [fund wallet](https://pulse.enecuum.com/#!/account/026df0aa41967d8d47082c36b29a164aa1c90cdd07cb02d373daaba90b8eca5301/0). The returned value is multiplied by 10^10.
-                      example: 3407411488880000000
-                    difficulty:
-                      type: number
-                      description: Mining difficulty.
-                      example: 9.69
-                    engaged_balance:
-                      type: integer
-                      description: Total stakes of PoA and PoS nodes. The returned value is multiplied by 10^10.
-                      example: 3272847385977657300
-                    full_count:
-                      type: integer
-                      description: Number of active Full nodes.
-                      example: 2
-                    height:
-                      $ref: '#/components/schemas/Height'
-                    indexer_ptr:
-                      type: integer
-                      description: Block hash that is used by the explorer.
-                      example: 0
-                    maxApkVersion:
-                      type: integer
-                      description: This is used for auto updating of Enecuum Masternode Android app.
-                      example: 0
-                    max_stake:
-                      type: integer
-                      description: PoA stake threshold. Having greater stake results in no additional rewards. The returned value is multiplied by 10^10.
-                      example: 250000000000000
-                    max_tps:
-                      type: integer
-                      description: Current maximum number of transactions per second. This is NOT the maximum possible TPS for Enecuum.
-                      example: 17
-                    minApkVersion:
-                      type: integer
-                      description: Minimum version of Enecuum Android App required for mining.
-                      example: 0
-                    min_stake:
-                      $ref: '#/components/schemas/MinStake'
-                    network_hashrate:
-                      type: integer
-                      description: Network hashrate in hashes per second.
-                      example: 826
-                    poa_capable_count:
-                      type: integer
-                      description: The number of PoA accounts capable of mining, i.e., with  available balance of at least minimum stake.
-                      example: 2109
-                    poa_count:
-                      type: integer
-                      description: Number of active PoA nodes.
-                      example: 648
-                    pos_active_count:
-                      type: integer
-                      description: Number of PoS contracts that have received rewards in the last X blocks (the value may be different, currently X = 5760).
-                      example: 1
-                    pos_count:
-                      type: integer
-                      description: Number of active PoS nodes.
-                      example: null
-                    pos_total_count:
-                      type: integer
-                      description: Number of all PoS contracts.
-                      example: 23
-                    pow_count:
-                      type: integer
-                      description: Number of active PoW nodes.
-                      example: 1
-                    proposed_inflation:
-                      type: integer
-                      description: Proposed inflation calculated as yearly rewards divided by total supply.
-                      example: 0
-                    referrer_stake:
-                      $ref: '#/components/schemas/ReferrerStake'
-                    reward_poa:
-                      type: integer
-                      description: Rewards received by PoA nodes in the last 24 hours. The returned value is multiplied by 10^10.
-                      example: 1016375584599730
-                    reward_pos:
-                      type: integer
-                      description: Rewards received by PoS nodes in the last 24 hours. The returned value is multiplied by 10^10.
-                      example: 291775352000000
-                    reward_pow:
-                      type: integer
-                      description: Rewards received by PoW nodes in the last 24 hours. The returned value is multiplied by 10^10.
-                      example: 26525032000000
-                    total_daily_pos_stake:
-                      type: integer
-                      description: TODO.
-                      example: 0
-                    total_daily_stake:
-                      type: integer
-                      description: Total PoA nodes stake. The returned value is multiplied by 10^10.
-                      example: 3272841444722907600
-                    tps:
-                      type: integer
-                      description: Transactions per second.
-                      example: 0
-                    tsup:
-                      type: integer
-                      description: ENQ total supply. The returned value is multiplied by 10^10.
-                      example: 1901936042160000000
-                    txfee_daily_30d_avg:
-                      type: integer
-                      description: Average transaction fees in the last 30 days.
-                      example: 28560
-                    txfee_hourly_24h_avg:
-                      type: integer
-                      description: Average transaction fees in the last 24 hours.
-                      example: 2071
-  /height:
-    get: 
-      tags: 
-        - General
-      summary: 'Returns blockchain height.'
-      description: 'Returns the last block number, i.e., the total number of blocks in the blockchain. The block count starts with 0.'
-      responses:
-        '200':
-            description: Successfully returned block height.
-            content:
-              application/json:
-                schema:
-                  properties:
-                    height:
-                      $ref: '#/components/schemas/Height'
-                      
-#  /macroblock:
-#    get: 
-#      tags: 
-#        - General
-##      summary: 'Returns contents of a macroblock.'
-#      description: 'Returns k-block, microblocks and s-blocks attached to it. Microblock hashes are sorted lexicographically in hexadecimal format.'
-#      parameters:
-#        - name: hash
-#          in: query
-#          required: true
-#          description: 'Macroblock/k-block hash.'
-#          example: 0028caa83e2cba8d32e6448130805f168d9348218ce37d7d35993ad050b7952b
-#          schema:
-#            $ref: '#/components/schemas/Hash'
-#      responses:
-#        '200':
-#          description: Successfully returned macroblock content.
-#          content:
-#            application/json:
-#              schema:
-#                type: object
-#                properties:
-#                  kblock:
-#                    type: object
-#                    description: 'K-block content. A macroblock can contain only one k-block.'
-#                    properties:
-#                      hash: 
-#                        allOf:
-#                          - $ref: '#/components/schemas/Hash'
-#                          - example: 0028caa83e2cba8d32e6448130805f168d9348218ce37d7d35993ad050b7952b
-#                      n:
-#                        type: integer
-#                        description: 'Height of the macroblock.' 
-#                        example: 5211
-#                      time:
-#                        type: integer
-#                        description: 'K-block publishing time in Unix Time format.' 
-#                        example: 1592385962
-#                      publisher:
-#                       type: string
-#                        description: 'Public key of a k-block publisher.' 
-#                        example: 034b4875bf08ffd5a4f0b06c21f951aa3e2f979d2d9f1bb4a64e0600eac2350beb
-#                      nonce:
-#                        allOf:
-#                          - $ref: '#/components/schemas/Nonce'
-#                          - example: 41
-#                      link:
-#                        type: string
-#                        description: 'Previous k-block hash.' 
-#                        example: 00fb459c1f8de0b24d074641a76878ab9528acaf62a9a33a0d9874a92e3349b5
-#                      sprout:
-#                        type: string
-#                        description: 'Merkle tree top hash.' 
-#                        example: BITGENESIS
-#                      m_root:
-#                        type: string
-#                        description: 'Merkle tree root.' 
-#                        example: 61b80791bfdd95cf958b3eb21412dc15634f15b5e692e68401abdf9b1d794135
-#                      reward:
-#                        type: integer
-#                        description: 'Reward for k-block mining.' 
-#                        example: 15449600000
-#                      target_diff:
-#                        type: integer
-#                        description: 'Hash calculation difficulty.' 
-#                        example: 141304204
-#                  mblocks:
-#                    type: array
-#                    description: 'Microblock content. There can be multiple microblocks. In each microblock, there can be multiple transactions.'
-#                    items:
-#                      type: object
-#                      properties:
-#                        hash:
-#                          $ref: '#/components/schemas/Hash'
-#                        tx_cnt:
-#                          type: integer
-#                          description: 'The amount of transactions in a microblock.'
-#                    example:
-#                      - hash: bfac67dcb2f2b7a8275f0787c8c98f356b6a51635de61bc981c0eec386453fe7
-#                        tx_cnt: 3
-#                      - hash: caa23e95b2cd0f11f5713a340309c1148a9519c4178330f03e95a82b612758bb
-#                        tx_cnt: 3
-#                  sblocks:
-#                    type: array
-#                    description: 'Statblock content. There can be multiple statblocks.'
-#                    items:
-#                      type: object
-#                      properties:
-#                        hash:
-#                          $ref: '#/components/schemas/Hash'
-#                    example:
-#                      - hash: 57c5d28b3e82508a873d0c311aeabdc87642e6f6802196110a7c0146f6fb9991
-                    
-
-  /macroblock
-    get:
-      tags:
-        - BitExplorer
-      summary: 'Returns the contents of a macroblock'
-      parameters:
-      - in: query
-       name: hash
-        schema:
-          type: string
-        required: true
-        description: 'Macroblock hash'
-        example: 'f79474bce415d76a1c1ec34d844e668a420d95fd5fa9e6f8ff1a576c325b70dd'
-      responses: 
-      '200':
-        description: 'Properties of the macroblock'
-        content:
-          application/json:
-            schema:
-              properties:
-                kblock:
-                  type: object
-                  description: 'K-block content. A macroblock can contain only one k-block'
-                    properties:
-                      hash:
-                        type: string
-                        description: 'Kblock hash'
-                        example: 'f79474bce415d76a1c1ec34d844e668a420d95fd5fa9e6f8ff1a576c325b70dd'
-                      n:
-                        type: integer
-                        description: 'Kblock height'
-                        example: 223320
-                      time: 
-                        type: integer
-                        description: 'Kblock publishing time as a UNIX timestamp'
-                        example: 1651590301
-                      publisher:
-                        type: string
-                        description: 'Public key of a k-block publisher'
-                        example: '03a3a059b05feb9443c9cc352161f1873b97e0dff61c939e77f1923113631cf8ea'
-                      nonce:
-                        type: integer
-                        description: 'Kblock nonce'
-                        example: 1640501849
-                      link:
-                        type: string
-                        description: 'Previous k-block's hash'
-                        example: '4eabd6269f205e2b16aeb73102a53c5e1391810d2e985d3cb8c9d993c94dea1a'
-                      sprout: 
-                        type: string
-                        description: 'Merkle tree top hash'
-                        example: 'BITGENESIS'
-                      m_root:
-                        type: string
-                        description: 'Merkle tree root'
-                        example: '3070c01d553ecea1ccdf203604dec36173da353f1ede5918dc88d09f4a96fc4b'
-                      leader_sign:
-                        type: object
-                        description: 'To be clarified'
-                          properties:
-                            type:
-                              type: string
-                              description: 'Leader sign type (TO BE CLARIFIED)'
-                              example: 'Buffer'
-                            data:
-                              type: array
-                              description: 'Leader sign (to be clarified)'
-                              items:
-                                properties:
-                                  type: integer
-                                  description: 'TO BE CLARIFIED (hexadecimal or not?)'
-                                  example: 123
-                        reward: 
-                          type: integer
-                          description: 'Reward for k-block mining'
-                          example: 1523000000
-                        target_diff:
-                          type: integer
-                          description: 'Hash calculation difficulty'
-                          example: 0
-                mblocks:
-                  type: array
-                  description: 'Microblock content. There can be multiple microblocks. In each microblock, there can be multiple transactions'
-                  items: 
-                    type: object
-                    properties:
-                      hash:
-                        properties:
-                          type: string
-                          description: 'Mblock hash'
-                      tx_count:
-                        properties:
-                          type: integer
-                          description: 'Count of transactions'
-                  example:
-                    - hash: '270d10646755142b5d79ba121985cb6c73f97f10df4d960474cc7e3c8999cd27'
-                    - tx_count: 3   
-                sblocks:
-                  type: array
-                  description: 'Sblock properties'
-                  items:
-                    type: object 
-                      properties:
-                        hash:
-                          type: string
-                          description: 'Sblock hash'
-                          example: '8a643dc237d86c948bbed5b9bc6f22366d2be54df7722bbddafbe6597b37db84'
-                snapshot_hash:
-                  type: integer #?
-                  description: 'TO BE CLARIFIED'
-                  example: 'null'                 
 
 
-  /macroblock_by_height:
-    get:
-      tags:
-        - General
-      summary: 'Returns macroblock info by its height.'
-      description: 'Returns k-block, microblocks and s-blocks attached to it. Microblock hashes are sorted lexicographically in hexadecimal format.'
-      parameters:
-        - name: height
-          in: query
-          required: true
-          description: 'Block number (height)'
-          schema:
-            type: integer
-            example: 5211
-      responses:
-        '200':
-          description: Successfully returned macroblock content.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  kblock:
-                    type: object
-                    description: 'K-block content. A macroblock can contain only one k-block.'
-                    properties:
-                      hash: 
-                        allOf:
-                          - $ref: '#/components/schemas/Hash'
-                          - example: 0028caa83e2cba8d32e6448130805f168d9348218ce37d7d35993ad050b7952b
-                      n:
-                        type: integer
-                        description: 'Height of the macroblock.' 
-                        example: 5211
-                      time:
-                        type: integer
-                        description: 'K-block publishing time in Unix Time format.' 
-                        example: 1592385962
-                      publisher:
-                        type: string
-                        description: 'Public key of a k-block publisher.' 
-                        example: 034b4875bf08ffd5a4f0b06c21f951aa3e2f979d2d9f1bb4a64e0600eac2350beb
-                      nonce:
-                        allOf:
-                          - $ref: '#/components/schemas/Nonce'
-                          - example: 41
-                      link:
-                        type: string
-                        description: 'Previous k-block hash.' 
-                        example: 00fb459c1f8de0b24d074641a76878ab9528acaf62a9a33a0d9874a92e3349b5
-                      sprout:
-                        type: string
-                        description: 'Merkle tree top hash.' 
-                        example: BITGENESIS
-                      m_root:
-                        type: string
-                        description: 'Merkle tree root.' 
-                        example: 61b80791bfdd95cf958b3eb21412dc15634f15b5e692e68401abdf9b1d794135
-                      reward:
-                        type: integer
-                        description: 'Reward for k-block mining.' 
-                        example: 15449600000
-                      target_diff:
-                        type: integer
-                        description: 'Hash calculation difficulty.' 
-                        example: 141304204
-                  mblocks:
-                    type: array
-                    description: 'Microblock content. There can be multiple microblocks. In each microblock, there can be multiple transactions.'
-                    items:
-                      type: object
-                      properties:
-                        hash:
-                          $ref: '#/components/schemas/Hash'
-                        tx_cnt:
-                          type: integer
-                          description: 'The amount of transactions in a microblock.'
-                    example:
-                      - hash: bfac67dcb2f2b7a8275f0787c8c98f356b6a51635de61bc981c0eec386453fe7
-                        tx_cnt: 3
-                      - hash: caa23e95b2cd0f11f5713a340309c1148a9519c4178330f03e95a82b612758bb
-                        tx_cnt: 3
-                  sblocks:
-                    type: array
-                    description: 'Statblock content. There can be multiple statblocks.'
-                    items:
-                      type: object
-                      properties:
-                        hash:
-                          $ref: '#/components/schemas/Hash'
-                    example:
-                      - hash: 57c5d28b3e82508a873d0c311aeabdc87642e6f6802196110a7c0146f6fb9991   
-  /mblock:
-    get:
-      tags: 
-        - General
-      summary: 'Returns contents of a microblock.'
-      description: 'Returns microblock transactions and header. A microblock is a part of a macroblock. Microblocks contain transactions, which are sorted lexicographically by hexadecimal hash.'
-      parameters: 
-        - name: hash
-          in: query
-          required: true
-          description: 'Microblock hash.'
-          schema:
-            allOf:
-              - $ref: '#/components/schemas/Hash'
-              - example: 1995c5e96b615d217957aefe7548017e81c50880036b887dce8ea487e1f90cca
-      responses:
-        '200':
-          description: Successfully returned microblock contents.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  transactions:
-                    type: array
-                    description: 'Transaction content. There can be multiple transactions.'
-                    items:
-                      type: object
-                      properties:
-                        hash:
-                          $ref: '#/components/schemas/Hash'
-                        from:
-                          $ref: '#/components/schemas/From'
-                        to:
-                          $ref: '#/components/schemas/To'
-                        amount:
-                          $ref: '#/components/schemas/Amount'
-                        mblocks_hash:
-                          type: string
-                          description: M-block hash. M-blocks contain transactions.
-                          example: a0477381285cdb1815cb7bb939baf9bd1785c76792be82d7a310818189ff9dbd
-                        nonce:
-                          $ref: '#/components/schemas/Nonce'
-                        status:
-                          $ref: '#/components/schemas/Status'
-                        sign:
-                          $ref: '#/components/schemas/Sign'
-                        ticker:
-                          $ref: '#/components/schemas/Token' 
-                        data:
-                          $ref: '#/components/schemas/Data'
-                  header:
-                    type: object
-                    description: 'Microblock header.'
-                    properties:
-                      kblocks_hash: 
-                        allOf:
-                          - $ref: '#/components/schemas/Hash'
-                          - example: 007bbe8c1256915d5ebdc51ff9cec9792d79b2d533832e5fe203129cb949360f
-                      publisher:
-                        type: string
-                        description: 'Public key of a k-block publisher.' 
-                        example: 034b4875bf08ffd5a4f0b06c21f951aa3e2f979d2d9f1bb4a64e0600eac2350beb
-                      referrer:
-                        type: string
-                        description: 'Public key of a referrer. Can be null.' 
-                        nullable: true
-                        example: null
-                      mblocks_hash:
-                        allOf:
-                          - $ref: '#/components/schemas/Hash'
-                          - example: fb263c111d0b07afb2fb0125f7e1b48060d4b24eaeef83afed9d570b5cbc0f09
-                      reward:
-                        type: integer
-                        description: 'A reward for the microblock publication.' 
-                        example: 4387962285
-                      nonce:
-                        $ref: '#/components/schemas/Nonce'
-                      token:
-                        $ref: '#/components/schemas/Token'
+### PoA - all methods missing!
 
-  /sblock:
-    get:
-      tags: 
-        - General
-      summary: 'Returns contents of a statblock.'
-      description: 'Returns statblock header. A statblock is a part of a macroblock.'
-      parameters: 
-        - name: hash
-          in: query
-          required: true
-          description: 'Statblock hash.'
-          schema:
-            allOf:
-              - $ref: '#/components/schemas/Hash'
-              - example: f6503f7f6388e53a0284f641c1872b61b62bcec3adb5420d430c2676455d4c2b
-      responses:
-        '200':
-            description: Successfully returned statblock contents.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    header:
-                      type: object
-                      properties:
-                        kblocks_hash: 
-                          allOf:
-                            - $ref: '#/components/schemas/Hash'
-                            - example: 007bbe8c1256915d5ebdc51ff9cec9792d79b2d533832e5fe203129cb949360f
-                        publisher:
-                          type: string
-                          description: 'Public key of a k-block publisher.' 
-                          example: 034b4875bf08ffd5a4f0b06c21f951aa3e2f979d2d9f1bb4a64e0600eac2350beb
-                        sblocks_hash:
-                          $ref: '#/components/schemas/Hash'
-                        reward:
-                          type: integer
-                          description: 'A reward for the statblock publication.' 
-                          example: 4387962285
-  /token_info:
-    get: 
-      tags: 
-        - Token
-      summary: 'Returns information about the token.'
-      description: 'Returns general information about the token. Multiple examples of possible responses can be chosen below. The description of the response can be found in the response schema.'
-      parameters: 
-        - name: hash
-          in: query
-          required: true
-          description: 'Token hash.'
-          schema:
-            $ref: '#/components/schemas/Token'
-      responses:
-        '200':
-            description: Successfully returned token info.
-            content:
-              application/json:
-                schema:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      hash:
-                        $ref: '#/components/schemas/Token'
-                      owner:
-                        $ref: '#/components/schemas/Owner'
-                      fee_type:
-                        type: integer
-                        description: |
-                          One of the following fee types is possible:
-                          - 0 means flat fee;
-                          - 1 means percent fee.
-                        enum: [0,1]
-                        example: 0
-                      fee_value:
-                        type: integer
-                        description: For flat fee, the fee amount is multiplied by 10^*d*, where *d* stands for the number of decimal places. For percent fee, the fee amount is multiplied by 100.
-                        example: 10000000000
-                      fee_min:
-                        type: integer
-                        description: The minimum flat fee in case the token uses percent fee. 
-                        example: 10000000000
-                      ticker:
-                        $ref: '#/components/schemas/Ticker'
-                      decimals:
-                        $ref: '#/components/schemas/Decimals'
-                      total_supply:
-                        type: integer
-                        description: The token emission. The amount is multiplied by 10^*d*, where *d* stands for the number of decimal places. 
-                        example: 5010637449999934464
-                      caption:
-                        type: string
-                        description: A 0-40 character token description. Can be empty.
-                        example: mining token 2
-                      active:
-                        type: integer
-                        description: |
-                          One of the following statuses is possible:
-                          - 0 means inactive;
-                          - 1 means active.
-                        enum: [0,1]
-                        example: 1
-                      reissuable:
-                        $ref: '#/components/schemas/Reissuable'
-                      minable:
-                        $ref: '#/components/schemas/Minable'
-                      max_supply:
-                        type: integer
-                        description: A maximum token emission. Upon reaching this number, the token can no longer be mined.
-                        example: 10000000000000000000
-                      block_reward:
-                        type: integer
-                        description: A reward for each mined macroblock. This number includes the referral reward.
-                        example: 50000000000
-                      min_stake:
-                        $ref: '#/components/schemas/MinStake'
-                      referrer_stake:
-                        $ref: '#/components/schemas/ReferrerStake'
-                      ref_share:
-                        type: integer
-                        description: A share of the total block reward that determines the referral reward amount. The referral reward is distributed among the referral and their agent equally
-                        example: 1000
-                      txs_count:
-                        type: integer
-                        description: The number of transactions with this token (within which timeframe?)
-                        example: 1
-                      cg_price_usd:
-                        type: integer
-                        description: CoinGecko price of the token
-                        example: null
-                      dex_price_usd:
-                        type: integer
-                        description: Price of the token on pour DEX (ENEX? TO BE CLARIFIED)
-                        example: 0.0361261927
-                      price_raw:
-                        type: object
-                        description: another ("raw", without decimal point) representation of cg_price_usd and dex_price_usd
-                        properties:
-                          cg_price:
-                            type: integer
-                            description: CoinGecko price, different representation
-                            example: null
-                          dex_price:
-                            type: integer
-                            description: Our DEX price, different representation
-                            example: 361261927
-                          decimals:
-                            type: integer
-                            description: Number of decimal places
-                            example: 10
-                examples:
-                  reissuable:
-                    description: Tokens with a flexible supply. After the token release, its supply can be changed by issuing or burning of coins.
-                    value:
-                      - hash: "0000000000000000000000000000000000000000000000000000000000000000"
-                        owner: 029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d
-                        fee_type: 0
-                        fee_value: 100000000
-                        fee_min: 0
-                        ticker: BIT
-                        decimals: 10
-                        total_supply: 3493999410335106560
-                        caption: Enecuum testnet BIT
-                        active: 0
-                        reissuable: 1
-                        minable: 0
-                        max_supply: null
-                        block_reward: null
-                        min_stake: null
-                        referrer_stake: null
-                        ref_share: null
-                  non-reissuable:
-                    description: Tokens with a fixed supply. After the token release, extra token coins can not be emitted.
-                    value:
-                      - hash: "0000000000000000000000000000000000000000000000000000000000000000"
-                        owner: 029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d
-                        fee_type: 0
-                        fee_value: 100000000
-                        fee_min: 0
-                        ticker: BIT
-                        decimals: 10
-                        total_supply: 3493999410335106560
-                        caption: Enecuum testnet BIT
-                        active: 0
-                        reissuable: 0
-                        minable: 0
-                        max_supply: null
-                        block_reward: null
-                        min_stake: null
-                        referrer_stake: null
-                        ref_share: null
-                  mineable:
-                    description: Tokens that can be mined. Some volume is selected for instant release (pre-mine), and the rest is mined by users.
-                    value:
-                      - hash: "0000000000000000000000000000000000000000000000000000000000000000"
-                        owner: 029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d
-                        fee_type: 0
-                        fee_value: 100000000
-                        fee_min: 0
-                        ticker: BIT
-                        decimals: 10
-                        total_supply: 3493999410335106560
-                        caption: Enecuum testnet BIT
-                        active: 0
-                        reissuable: 0
-                        minable: 1
-                        max_supply: 9000000000000000000
-                        block_reward: 96560000000
-                        min_stake: 250000000000
-                        referrer_stake: 10000000000000
-                        ref_share: 1000
-                        
-  /get_tokens_by_owner:
-    get:
-      tags: 
-        - Token
-      summary: 'Returns tokens by owner.'
-      description: 'Returns a list of tokens of the specified wallet.'
-      parameters: 
-        - name: owner
-          in: query
-          required: true
-          description: 'Token owner address.'
-          schema:
-            $ref: '#/components/schemas/Owner'
-      responses:
-        '200':
-            description: Successfully returned a list of tokens by owner.
-            content:
-              application/json:
-                schema:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      token_hash:
-                        $ref: '#/components/schemas/Token'
-                      total_supply:
-                        type: integer
-                        description: A token supply at the time of the issue. 
-                        example: 9510000000000
-                      fee_type:
-                        type: integer
-                        description: Determines whether the fee is fixed or percentage. 0 means fixed, 1 means percentage. 
-                        example: 0
-                      fee_value:
-                        type: integer
-                        description: An exact fee amount for token transactions. If the fee is fixed, the value is multiplied by 10^*d*, where *d* stands for the number of decimal places. If the fee is percentage, the value is multiplied by 100 (e.g. a 1% fee is returned as 100). 
-                        example: 10000000000
-                      fee_min:
-                        type: integer
-                        description: A minimum fee for token transactions if the token type is percentage. For fixed fees, fee_min equals fee_value.
-                        example: 10000000000
-                      reissuable:
-                        $ref: '#/components/schemas/Reissuable'
-                      minable:
-                        $ref: '#/components/schemas/Minable'
-                        
+### PoS - some methods available!
+
+
+# /get_pos_names:
+# /get_top_pos:
+# /get_min_stake:
+# /get_stake_limits: (min, max, default)
+# /referrer_stake:
+
   /get_pos_total_stake:
     get:
       tags: 
@@ -1536,6 +2133,8 @@ paths:
                   description: Total PoS nodes stake. The amount is multiplied by 10^*d*, where *d* stands for the number of decimal places.
                   example: 13020000000000
                   
+#  /get_pos_active_total_stake:
+
   /get_pos_list_count:
     get:
       tags: 
@@ -1689,27 +2288,9 @@ paths:
                       example: 0
 
                   
-  /get_transfer_lock:
-    get:
-      tags: 
-        - PoS
-      summary: 'Returns asset lock duration.'
-      description: 'Returns asset lock duration.' #TODO: elaborate
-      responses:
-        '200':
-          description: Successfully returned transfer lock.
-          content:
-            application/json:
-             schema:
-              properties:
-                transfer_lock:
-                  type: integer
-                  description: Transfer lock duration. #TODO: elaborate
-                  example: 5
-                  
   /get_pos_list_page:
     get:
-      deprecated: true
+      deprecated: true #OR IS IT DEPRECATED?
       tags: 
         - PoS
       summary: 'Returns a detailed PoS contract list.'
@@ -1777,351 +2358,6 @@ paths:
 # - /get_transfer_lock
 
 # BIT Explorer "unique" endpoints start here 
-
-  /network_info:
-    get:
-      tags:
-        - BitExplorer
-      summary: 'Retrieves network information'
-      description: 'Returns network info'
-      responses:
-        '200':
-          description: Successfully returned.
-          content:
-            application/json:
-              schema:
-                properties:
-                  target_speed: 
-                    type: integer
-                    description: desired interval between block release in seconds
-                    example: 15
-                  reward_ratio:
-                    type: object
-                    description: Shares of the native token block reward by node types (10,000 = 100%)   
-                    properties: 
-                      pos: 
-                        type: integer
-                        description: Reward ratio for PoS nodes
-                        example: 5500
-                      poa:
-                         type: integer
-                         description: Reward ratio for PoA nodes
-                         example: 3181
-                      pow:
-                         type: integer
-                         description: Reward ratio for PoW nodes
-                         example: 500
-                      ref:
-                        type: integer
-                        description: Reward ratio for referrals
-                        example: 819
-                  transfer_lock:
-                    type: integer
-                    description: Minimal amount of blocks between undelegation and transfer so that the transfer is valid 
-                    example: 5
-                  pos_min_stake:
-                    type: integer
-                    description: Minimal stake for a PoS node
-                    example: 25000000000
-                  native_token:
-                    type: object
-                    description: Native token properties
-                    properties: 
-                      hash: 
-                        type: string
-                        description: Native token hash
-                        example: 0000000000000000000000000000000000000000000000000000000000000001
-                      owner:
-                        type: string
-                        description: Address of the wallet that created the native token
-                        example: 029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d
-                      fee_type:
-                        type: integer
-                        description: Fee type (see comment below, TO BE CLARIFIED - see comment below)
-                        # 0 - flat fee for owner upon transaction in reward tokens, 1 - percent fee in reward tokens, 2 - native fee, fixed, charged in native tokens)
-                        example: 0
-                      fee_value:
-                        type: integer
-                        description: Fee value
-                        example: 1000000000
-                      ticker:
-                        type: string
-                        description: Native token ticker
-                        example: BIT
-                      decimals:
-                        type: integer
-                        description: Number of decimal places
-                        example: 10
-                      total_supply:
-                        type: string
-                        description: Total supply of native tokens
-                        example: 2455559059822244864
-                      caption:
-                        type: string
-                        description: Token name
-                        example: Enecuum Testnet BIT
-                      active:
-                        type: integer
-                        description: TO BE EXPLAINED
-                        # has something to do with mining slots?
-                        example: 1
-                      reissuable:
-                        type: integer
-                        description: (1 stands for tokens that can be minted and burned?)
-                        example: 0
-                      minable:
-                        type: integer
-                        description: Whether a token can be mined or not
-                        example: 1
-                      max_supply:
-                        type: integer
-                        description: Maximum token supply
-                        example: 3500000000000000000
-                      block_reward:
-                        type: integer
-                        description: Reward for the mining of a block
-                        example: 30460000000
-                      min_stake:
-                        type: integer
-                        description: The minimal stake for a PoA node (applies to mineable tokens only? null for others)
-                        example: 250000000000
-                      referrer_stake:
-                        type: integer
-                        description: TO BE EXPLAINED
-                        example: 10000000000000
-                      ref_share:
-                        type: integer
-                        description: TO BE EXPLAINED
-                        example: 2574
-                      txs_count:
-                        type: integer
-                        description: (TO BE CLARIFIED) amount of transactions with this token
-                        example: 6406044
-                      cg_price_usd:
-                        type: integer
-                        description: CoinGecko price of the token in USDT? (TO BE CLARIFIED)
-                        example: 0.03952753
-                      dex_price_usd:
-                        type: integer
-                        description: Price of the token on pour DEX (ENEX? TO BE CLARIFIED)
-                        example: 0.03952753
-                      price_raw:
-                        type: object
-                        description: a different representation of cg_price_usd and dex_price_usd
-                        properties:
-                          cg_price:
-                            type: integer
-                            description: CoinGecko price, different representation
-                            example: 395275300
-                          dex_price:
-                            type: integer
-                            description: Our DEX price, different representation
-                            example: 395275300
-                          decimals:
-                            type: integer
-                            description: Number of decimal places
-                            example: 10
-                  origin:
-                    type: object
-                    description: TO BE EXPLAINED
-                    properties:
-                      publisher:
-                        type: string
-                        description: TO BE EXPLAINED
-                        example: 029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d
-                      reward:
-                        type: integer
-                        description: TO BE EXPLAINED
-                        example: 2449913938434801029
-                      hash:
-                        type: string
-                        description: TO BE EXPLAINED
-                        example: BITGENESIS
-                      link:
-                        type: string
-                        description: TO BE EXPLAINED
-                        example: BITGENESIS
-                      sprout:
-                        type: string
-                        description: TO BE EXPLAINED
-                        example: BITGENESIS
-                      time:
-                        type: integer
-                        description: TO BE EXPLAINED
-                        example: 0
-                  fee_shares:
-                    type: object
-                    description: TO BE EXPLAINED
-                    properties:
-                      gen_share:
-                        type: integer
-                        description: TO BE EXPLAINED
-                        example: 300
-                      pow_share:
-                        type: integer
-                        description: TO BE EXPLAINED
-                        example: 50
-                      ldr_share:
-                        type: integer
-                        description: TO BE EXPLAINED
-                        example: 50
-                      pos_share:
-                        type: integer
-                        description: TO BE EXPLAINED
-                        example: 9600
-                  MPK:
-                    type: object
-                    description: TO BE EXPLAINED
-                    properties: 
-                      x:
-                        type: integer
-                        description: TO BE EXPLAINED
-                        example: 1 1887977886599394063028178950947279860127724050479032082036805996418912013153131127696715993837524647383570338355695255786360661495991220227612598684883028 3780267397673468252343519622281735554920859525529214838409547998448097213079684300112811104508239777017758612507356636174013439449215588949644233352733139
-                      y: 
-                        type: integer
-                        description: TO BE EXPLAINED
-                        example: 1 607218419856648654813472028821287383397295365990787484847671131205048590195733091420684296247120974745720384180519261046258140424163987254801646299078125 3574484102938033217678888696334982695759754668992496989785966938244090853405896393856377280681069520660874902711918462986779665727013338716276831662950626
-                  mblock_slots:
-                    type: object
-                    description: TO BE EXPLAINED
-                    properties:
-                      size:
-                        type: integer
-                        description: TO BE EXPLAINED
-                        example: 2
-                      count:
-                        type: integer
-                        description: TO BE EXPLAINED
-                        example: 2
-                      min_stake:
-                        type: integer
-                        description: TO BE EXPLAINED - minimal stake
-                        example: 5000000000000000
-                  dex:
-                    type: object
-                    description: TO BE EXPLAINED
-                    properties:
-                      DEX_COMMANDER_ADDRESS:
-                        type: string
-                        description: TO BE EXPLAINED
-                        example: 033333333333333333333333333333333333333333333333333333333333333333
-                      DEX_BURN_ADDRESS:
-                        type: string
-                        description: TO BE EXPLAINED
-                        example: 02dead000000000000000000000000000000000000000000000000000000000000
-                      DEX_ENX_TOKEN_HASH:
-                        type: string
-                        description: TO BE EXPLAINED
-                        example: 824e7b171c01e971337c1b25a055023dd53c003d4aa5aa8b58a503d7c622651e
-                      DEX_SPACE_STATION_ID:
-                        type: string
-                        description: TO BE EXPLAINED
-                        example: 50789932e52d80ff65a56547274498d865ce1d85f14bbacdcd5b575191f87621
-                      DEX_COMMANDER_FEE:
-                        type: integer
-                        description: TO BE EXPLAINED
-                        example: 5
-                      DEX_POOL_FEE:
-                        type: integer
-                        description: TO BE EXPLAINED
-                        example: 30
-                      DEX_TRUSTED_TOKENS:
-                        type: string
-                        description: TO BE EXPLAINED
-                        example: 824e7b171c01e971337c1b25a055023dd53c003d4aa5aa8b58a503d7c622651e
-  /tps: 
-    get:
-      tags:
-        - BitExplorer
-      summary: 'Returns TPS (transactions per second) value'
-      responses:
-        '200':
-          description: Successfully returned.
-          content:
-            application/json:
-              schema:
-                properties:
-                  tps:
-                    type: integer
-                    description: 'Average rounded aount of transactions during the last 300 seconds'
-                    example: 1
-
-  /get_token_holder_count:
-    get:
-      tags:
-        - BitExplorer
-      summary: 'Returns the amount of accounts that hold the specified token. If no token is specified, it returns the amount of accounts that hold the native token (BIT)'
-      parameters:
-        - in: query
-          name: hash
-          required: false
-          description: 'Token hash.'
-          schema:
-            type: string
-      responses:
-        '200':
-          description: The amount of token holders.
-          content:
-            application/json:
-              schema:
-                properties:
-                  count:
-                    type: integer
-                    description: 'The amount of token holding accounts'
-                    example: 34676
-
-  /get_tokens_count:
-    get:
-      tags:
-        - BitExplorer
-      summary: 'Returns the number of tokens deployed on the network and the breakdown of those tokens by type.'
-      responses:
-        '200':
-          description: 'The number of tokens and their breakdown by type.'
-          content:
-            application/json:
-              schema:
-                properties:
-                  count:
-                    type: integer
-                    description: 'The total number of tokens deployed on the network.'
-                    example: 1427
-                  non_reissuable:
-                    type: integer
-                    description: 'The number of non-reissuable tokens.'
-                    example: 873
-                  reissuable:
-                    type: integer
-                    description: 'The number of reissuable tokens.'
-                    example: 279
-                  minable:
-                    type: integer
-                    description: 'The number of minable tokens.'
-                    example: 275
-  /get_tickers_all: 
-    get:
-      tags:
-        - BitExplorer
-      summary: 'Returns the list of all token tickers on the network, including token hashes and captions.'
-      responses:
-        '200':
-          description: 'The list of all token tickers on the network, including token hashes and captions.'
-          content:
-            application/json:
-              schema:
-                properties:
-                  hash:
-                    type: string
-                    description: 'Token hash.'
-                    example: 0000000000000000000000000000000000000000000000000000000000000001
-                  ticker:
-                    type: string
-                    description: 'Token ticker.'
-                    example: BIT
-                  caption:
-                    type: string
-                    description: 'Token caption (long name).'
-                    example: Enecuum testnet BIT
 
   # This is BIT Explorer /get_transfer_lock, invalidates YAML. Swagger allows only one API endpoint is allowed in a single YAML.
   
@@ -2259,283 +2495,46 @@ paths:
 #                        type: integer
 #                        description: Number of decimal places
 #                        example: 10
-  /native_token:
-    get:
-      tags: 
-        - BitExplorer
-      summary: 'Returns token info about the native token of the network.'
-      responses:
-        '200':
-          description: Token info.
-          content:
-            application/json:
-              schema:
-                properties: 
-                  hash: 
-                    type: string
-                    description: Token hash
-                    example: '0000000000000000000000000000000000000000000000000000000000000001'
-                  owner:
-                    type: string
-                    description: Address of the account that created the token
-                    example: 029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d
-                  fee_type:
-                    type: integer
-                    description: Fee type (see comment below, TO BE CLARIFIED - see comment below)
-                    # 0 - flat fee for owner upon transaction in reward tokens, 1 - percent fee in reward tokens, 2 - native fee, fixed, charged in native tokens)
-                    example: 0
-                  fee_value:
-                    type: integer
-                    description: Fee value
-                    example: 1000000000
-                  fee_min:
-                    type: integer
-                    description: Minimal fee
-                    example: 1000000000
-                  ticker:
-                        type: string
-                        description: Token ticker
-                        example: BIT
-                  decimals:
-                    type: integer
-                    description: Number of decimal places
-                    example: 10
-                  total_supply:
-                    type: string
-                    description: Total supply of the token
-                    example: 2455559059822244864
-                  caption:
-                    type: string
-                    description: Long token name
-                    example: Enecuum Testnet BIT
-                  active:
-                    type: integer
-                    description: TO BE EXPLAINED
-                    # has something to do with mining slots?
-                    example: 0
-                  reissuable:
-                    type: integer
-                    description: Indicates whether the token is reissuable (can be minted and burned)
-                    example: 0
-                  minable:
-                    type: integer
-                    description: Indicates whether a token can be mined
-                    example: 1
-                  max_supply:
-                    type: integer
-                    description: Maximum token supply
-                    example: 3500000000000000000
-                  block_reward:
-                    type: integer
-                    description: Reward for the mining of a block
-                    example: 30460000000
-                  min_stake:
-                    type: integer
-                    description: Minimal stake for a PoS node
-                    example: 250000000000
-                  referrer_stake:
-                    type: integer
-                    description: TO BE EXPLAINED
-                    example: 10000000000000
-                  ref_share:
-                    type: integer
-                    description: TO BE EXPLAINED
-                    example: 2574
-                  txs_count:
-                    type: integer
-                    description: (TO BE CLARIFIED) Amount of transactions with this token
-                    example: 6406044
-                  cg_price_usd:
-                    type: integer
-                    description: CoinGecko price of the token in USD (TO BE CLARIFIED)
-                    example: 0.03952753
-                  dex_price_usd:
-                    type: integer
-                    description: Price of the token on pour DEX (ENEX? TO BE CLARIFIED)
-                    example: 0.03952753
-                  price_raw:
-                    type: object
-                    description: another ("raw", without decimal point) representation of cg_price_usd and dex_price_usd
-                    properties:
-                      cg_price:
-                        type: integer
-                        description: CoinGecko price, different representation
-                        example: 395275300
-                      dex_price:
-                        type: integer
-                        description: Our DEX price, different representation
-                        example: 395275300
-                      decimals:
-                        type: integer
-                        description: Number of decimal places
-                        example: 10
-  /get_token_info_page:
-    get:
-      tags:
-        - BitExplorer
-      summary: 'Returns the properties of the tokens listed on a specific BIT Explorer page. If no page number is specified, the amount of tokens to be displayed on a page and the total number of token info pages are returned.'
-      # I really don't know whether the output should include ALL ten tokens listed on a page - to be clarified!
-      parameters:
-        - in: query
-          name: page
-          required: false
-          description: 'Page number.'
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Properties of the tokens listed on the specified page. 
-          content:
-            application/json:
-              schema:
-                properties: 
-                  hash: 
-                    type: string
-                    description: Token hash
-                    example: '0000000000000000000000000000000000000000000000000000000000000001'
-                  owner:
-                    type: string
-                    description: Address of the account that created the token
-                    example: '029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d'
-                  fee_type:
-                    type: integer
-                    enum: [0,1,2]
-                    description: Fee type |
-                      0 - flat fee for owner upon transaction in reward tokens
-                      1 - percentage fee in reward tokens
-                      2 - fixed fee, charged in native tokens
-#                    (see comment below, TO BE CLARIFIED - see comment below)
-                    # 0 - flat fee for owner upon transaction in reward tokens, 1 - percentage fee in reward tokens, 2 - fixed fee, charged in native tokens)
-                    example: 0
-                  fee_value:
-                    type: integer
-                    description: Fee value
-                    example: 1000000000
-                  fee_min:
-                    type: integer
-                    description: Minimal fee
-                    example: 1000000000
-                  ticker:
-                    type: string
-                    description: Token ticker
-                    example: BIT
-                  decimals:
-                    type: integer
-                    description: Number of decimal places
-                    example: 10
-                  total_supply:
-                    type: string
-                    description: Total supply of the token
-                    example: 2455559059822244864
-                  caption:
-                    type: string
-                    description: Long token name
-                    example: Enecuum Testnet BIT
-                  active:
-                    type: integer
-                    enum: [0,1]
-                    description: TO BE EXPLAINED (something to do with mining slots?)
-                    example: 0
-                  reissuable:
-                    type: integer
-                    enum: [0,1]
-                    description: Indicates whether the token is reissuable (can be minted and burned)
-                    example: 0
-                  minable:
-                    type: integer
-                    enum: [0,1]
-                    description: Indicates whether a token can be mined
-                    example: 1
-                  max_supply:
-                    type: integer
-                    description: Maximum token supply
-                    example: 3500000000000000000
-                  block_reward:
-                    type: integer
-                    description: Reward for the mining of a block
-                    example: 30460000000
-                  min_stake:
-                    type: integer
-                    description: Minimal stake for a PoA node (apples if the token is mineable) 
-                    example: 250000000000
-                  referrer_stake:
-                    type: integer
-                    description: TO BE EXPLAINED
-                    example: 10000000000000
-                  ref_share:
-                    type: integer
-                    description: TO BE EXPLAINED
-                    example: 2574
-                  txs_count:
-                    type: integer
-                    description: (TO BE CLARIFIED) Amount of transactions with this token
-                    example: 6406044
-                  in_slot:
-                    type: integer
-                    description: Describes whether the token is in the (current) mining slot (TO BE CLARIFIED)
-                    example: 0
-                  cg_price_usd:
-                    type: integer
-                    description: CoinGecko price of the token in USD (TO BE CLARIFIED)
-                    example: 0.03952753
-                  dex_price_usd:
-                    type: integer
-                    description: Price of the token on pour DEX (ENEX? TO BE CLARIFIED)
-                    example: 0.03952753
-                  price_raw:
-                    type: object
-                    description: another ("raw", without decimal point) representation of cg_price_usd and dex_price_usd
-                    properties:
-                      cg_price:
-                        type: integer
-                        description: CoinGecko price, different representation
-                        example: 395275300
-                      dex_price:
-                        type: integer
-                        description: Our DEX price, different representation
-                        example: 395275300
-                      decimals:
-                        type: integer
-                        description: Number of decimal places
-                        example: 10
-  \sblock:
-    get:
-    summary: 'Returns the properties of a sblock'
-    parameters:
-    - in: query
-      name: hash
-      schema:
-        type: string
-      required: true
-      description: 'Sblock hash'
-      example: 'de0942b3b1194cde66ba9bf45bd1bdf406e714d6d514b8c0e6fd58b5ee833693'
-      responses: 
-        '200':
-          description: 'Properties of the sblock'
-          content:
-            application/json:
-              schema:
-                properties:
-                  header:
-                    type: object
-                    description: Sblock header
-                    properties:
-                      kblocks_hash:
-                        type: string
-                        description: Kblock hash
-                        example: '395275300'
-                      publisher:
-                        type: string
-                        description: Publisher wallet hash
-                        example: '395275300'
-                      sblocks_hash:
-                        type: string
-                        description: Sblock hash
-                        example: '8a643dc237d86c948bbed5b9bc6f22366d2be54df7722bbddafbe6597b37db84'
-                      reward: 
-                        type: integer 
-                      description: Reward (TO BE CLARIFIED) 
-#                        example: 16753000000        
+
+
+# \sblock:
+#    get:
+#    summary: 'Returns the properties of a sblock'
+#    parameters:
+#    - in: query
+#      name: hash
+#      schema:
+#        type: string
+#      required: true
+#      description: 'Sblock hash'
+#      example: 'de0942b3b1194cde66ba9bf45bd1bdf406e714d6d514b8c0e6fd58b5ee833693'
+#      responses: 
+#        '200':
+3          description: 'Properties of the sblock'
+#          content:
+#            application/json:
+#              schema:
+#                properties:
+#                  header:
+#                    type: object
+#                    description: Sblock header
+#                    properties:
+#                      kblocks_hash:
+#                        type: string
+#                        description: Kblock hash
+#                        example: '395275300'
+#                      publisher:
+#                        type: string
+#                        description: Publisher wallet hash
+#                        example: '395275300'
+#                      sblocks_hash:
+#                        type: string
+#                        description: Sblock hash
+#                        example: '8a643dc237d86c948bbed5b9bc6f22366d2be54df7722bbddafbe6597b37db84'
+#                      reward: 
+#                        type: integer 
+#                      description: Reward (TO BE CLARIFIED) 
+##                        example: 16753000000        
 
 #  \sblock:
 #    get:
@@ -3108,9 +3107,41 @@ components:
 #          format: int64
       
 tags:
-  - name: General
+#  - name: General
+#  - name: Token
+#  - name: PoS
+#  - name: BitExplorer
+# new token names
+  - name: Network
   - name: Token
+  - name: Block
+  - name: Account
+  - name: Balance
+  - name: Transactions
+  - name: PoA
   - name: PoS
-  - name: BitExplorer
-    externalDocs:
-      url: https://guides.enecuum.com/how-to-pos.html
+  - name: Delegation
+  - name: DEX
+  - name: Coindata
+#    externalDocs:
+#      url: https://guides.enecuum.com/how-to-pos.html
+
+
+## SOMETHING TO BE CLARIFIED LATER
+
+#  /ext/plain/circ_supply:
+#    get:
+#      tags:
+#        - Network
+#      summary: '???'
+#      description: '???'
+#      responses:
+#          '200':
+#            description: '???'
+##            content:
+#              application/json:
+#                schema:
+#                  properties:
+#                    type: number
+#                    description: '???'
+#                    example: 245770310.8780264448
