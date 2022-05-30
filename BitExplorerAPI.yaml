@@ -101,6 +101,8 @@ servers:
 # Added3 by API Auto Mocking Plugin
 #  - description: SwaggerHub API Auto Mocking
 #    url: https://virtserver.swaggerhub.com/enecuum/EnecuumNodeAPI/1.0.0
+
+# NETWORK METHODS
   
 paths:
   /network_info:
@@ -721,6 +723,9 @@ paths:
                     type: number
                     description: 'Blockchain hash rate.'
                     example: 2.0139111001134378
+
+### TOKEN METHODS
+
   /native_token:
     get:
       tags: 
@@ -1450,7 +1455,7 @@ paths:
                       token:
                         $ref: '#/components/schemas/Token'
 
-# /mblocks - QUITE MYSTERIOUS, check Explorer.JS line 468 and onwards
+# /mblocks - QUITE MYSTERIOUS, check Explorer.JS line 468 and onwards - still investigating
 
   /sblock:
     get:
