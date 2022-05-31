@@ -1278,8 +1278,12 @@ paths:
                         hash:
                           $ref: '#/components/schemas/Hash'
                     example:
-                      - hash: 57c5d28b3e82508a873d0c311aeabdc87642e6f6802196110a7c0146f6fb9991   
-
+                      - hash: 57c5d28b3e82508a873d0c311aeabdc87642e6f6802196110a7c0146f6fb9991
+                  snapshot_hash:
+                    type: integer
+                    description: 'To be clarified!'
+                    example: null
+                    
   /macroblock_by_height:
     get:
       tags:
@@ -1378,7 +1382,7 @@ paths:
     get:
       tags: 
         - Block
-      summary: 'Returns contents of a microblock.'
+      summary: 'Returns the contents of a microblock.'
       description: 'Returns microblock transactions and header. A microblock is a part of a macroblock. Microblocks contain transactions, which are sorted lexicographically by hexadecimal hash.'
       parameters: 
         - name: hash
