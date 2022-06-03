@@ -1515,7 +1515,7 @@ paths:
             application/json:
               schema:
                 type: array
-                description: 'Last 10 macroblocks on the Explorer start page.'
+                description: 'Last 10 macroblocks as shown on the Explorer main page.'
                 items:
                   type: object
                   properties:
@@ -1569,7 +1569,7 @@ paths:
                       type: integer
                       description: 'Hash calculation difficulty.' 
                       example: 168922851
-
+                    
 
 
 # /lastblocks on page - TO BE ADDED
@@ -2181,6 +2181,53 @@ paths:
                       type: string
                       description: M-block hash. M-blocks contain transactions.
                       example: a0477381285cdb1815cb7bb939baf9bd1785c76792be82d7a310818189ff9dbd
+
+  /lasttxs:
+    get:
+      tags:
+        - Transactions
+      summary: 'Returns the information on the last 10 transactions.'
+      description: 'Returns the information on the last 10 transactions.'
+      responses:
+        '200':
+          description: 'Information about the last 10 transactions.'
+          content:
+            application/json:
+              schema:
+                type: array
+                description: 'Last 10 transactions as shown on the Explorer start page.'
+                items:
+                  type: object
+                  properties:
+                    hash:
+                      type: string
+                      description: Transaction hash.
+                      example: '0aa54540938265144271312188feef5ee2587069ac3ad52e4002fae839347e0a'
+                    from:
+                      type: string
+                      description: Sender's public key.
+                      example: '029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d'
+                    to: 
+                      type: string
+                      description: Recipient's public key.
+                      example: '029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d'
+                    amount: 
+                      $ref: '#/components/schemas/Amount'
+                    mblocks_hash:
+                      type: string
+                      description: Microblock hash.
+                      example: '2992402de0a84a960447db6c4158762494dd756bd16be31317f309ad57c6f5b2'
+                    nonce:
+                      $ref: '#/components/schemas/Nonce'
+                    status:
+                      $ref: '#/components/schemas/Status'
+                    sign:
+                      $ref: '#/components/schemas/Sign'
+                    ticker:
+                      $ref: '#/components/schemas/Token'
+                    data:
+                      $ref: '#/components/schemas/Data'
+
 
 
 ### PoA - all methods missing!
@@ -3095,7 +3142,7 @@ components:
     Nonce:
       type: integer
       description: Random number from 0 to 2^32.
-      example: 5761
+      example: 6456230090
     Height:
       type: integer
       description: Blockchain height, i.e., total number of blocks.
@@ -3156,7 +3203,7 @@ components:
               
                       console.log(tx);
                       ``` 
-      example: 3046022100dc14629aeb2b8b63424a9cbc8d6b2b4af3e60db0ebcecdd2853043ba73f753ca022100ce96750c3ee976691a762d4511eecf86bbf093e3b354189c31e26e5c90c6c007
+      example: 3046022100e1d8caa60812c23b5f56ce036c5577ac2f8d34c1d20489fd53f62b02fcd65d840221008b0cdb15ebc76035eba9ad679c3b9bcf0c55f8d6e1b786b6ebe35cc8ee69f402
     ReferrerStake:
       type: integer
       description: PoA node stake required to participate in the referral program as an agent (referrer). More in the [documentation](https://guides.enecuum.com/enq/referral.html). The returned value is multiplied by 10^10.
