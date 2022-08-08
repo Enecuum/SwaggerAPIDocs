@@ -2418,6 +2418,229 @@ paths:
                     type: string
                     description: Account ID (hash)
                     example: '029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d'
+  /account_in:
+    get:
+      tags: 
+        - Accounts
+      summary: 'Returns a page of 10 INCOMING WHAT? for the account with their properties.'
+      description: 'Returns a page of 10 INCOMING WHAT? for the account with their properties.'
+      parameters: 
+        - name: id
+          in: query
+          required: true
+          description: Address of the account 
+          schema:
+            type: string
+            example: '029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d'
+        - name: page
+          in: query
+          required: true
+          description: 'Page number (0 for the newest one)'
+          schema:
+            type: integer
+            example: 0
+      responses:
+        '200':
+            description: Successfully returned list of the last 10 rewards of the account on the specified page.
+            content:
+              application/json:
+               schema:
+                type: object
+                properties:
+                  balance:
+                    type: string
+                    description: Balance of **WHAT**?
+                    example: '948654598387604223'
+                  records:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        i:
+                          type: integer
+                          description: TO BE CLARIFIED - some ID?
+                          example: 3768307
+                        hash:
+                          type: string 
+                          description: Previous macroblock's hash (or not?).
+                          example: '33b3fa98fb9c1feac77d4ed495176403209630419dbf8b90e07cc655e21f5fd0'
+                        time:
+                          type: integer
+                          description: Timestamp.
+                          example: 1659974762
+                        kreward:
+                          type: integer
+                          description: macroblock reward? - TO BE CLARIFIED
+                          example: null
+                        sreward:
+                          type: integer
+                          description: statblock reward? - TO BE CLARIFIED
+                          example: null
+                        mreward:
+                          type: integer
+                          description: microblock reward? - TO BE CLARIFIED
+                          example: null
+                        output:
+                          type: string
+                          description: null for account_in method??? - TO BE CLARIFIED
+                          example: ''
+                        input:
+                          type: string
+                          description: something for account_in??? - TO BE CLARIFIED
+                          example: '15133177068'
+                        status:
+                          type: integer
+                          enum: [0, 1, 2, 3]
+                          description: | 
+                            Transaction status - TBC? One of the following statuses is possible:
+                            - 0 - the transaction is accepted by the node, awaiting processing
+                            - 1 - the transaction is a duplicate
+                            - 2 - the transaction was rejected
+                            - 3 - the transaction was confirmed and is successful
+                          example: 3
+                        token_hash:
+                          type: string
+                          description: Hash of the transaction's token
+                          example: '0000000000000000000000000000000000000000000000000000000000000001'
+                        fee_type:
+                          type: integer
+                          description: Fee type |
+                            - 0 - flat fee for owner upon transaction in reward tokens
+                            - 1 - percentage fee in reward tokens
+                            - 2 - fixed fee, charged in native tokens
+                          example: 0
+                        fee_value:
+                          type: integer
+                          description: Transaction fee value in the appropriate tokens
+                          example: 1000000000
+                        fee_min:
+                          type: integer
+                          description: Minimum transaction fee (applies for percentage fees if set)
+                          example: 0
+                        fee:
+                          type: string
+                          description: ??? - Minimum transaction fee (applies for percentage fees if set)
+                          example: '1000000000'
+                  page_count:
+                    type: integer
+                    description: Total page count for the account's reward records
+                    example: 37715
+                  id: 
+                    type: string
+                    description: Account ID (hash)
+                    example: '029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d'
+  /account_out:
+    get:
+      tags: 
+        - Accounts
+      summary: 'Returns a page of 10 OUTGOING WHAT? for the account with their properties.'
+      description: 'Returns a page of 10 OUTGOING WHAT? for the account with their properties.'
+      parameters: 
+        - name: id
+          in: query
+          required: true
+          description: Address of the account 
+          schema:
+            type: string
+            example: '029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d'
+        - name: page
+          in: query
+          required: true
+          description: 'Page number (0 for the newest one)'
+          schema:
+            type: integer
+            example: 0
+      responses:
+        '200':
+            description: Successfully returned list of the last 10 rewards of the account on the specified page.
+            content:
+              application/json:
+               schema:
+                type: object
+                properties:
+                  balance:
+                    type: string
+                    description: Balance of **WHAT**?
+                    example: '948650851276771054'
+                  records:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        i:
+                          type: integer
+                          description: TO BE CLARIFIED - some ID?
+                          example: 3768307
+                        hash:
+                          type: string 
+                          description: Previous macroblock's hash (or not?).
+                          example: '33b3fa98fb9c1feac77d4ed495176403209630419dbf8b90e07cc655e21f5fd0'
+                        time:
+                          type: integer
+                          description: Timestamp.
+                          example: 1659974762
+                        kreward:
+                          type: integer
+                          description: macroblock reward? - TO BE CLARIFIED
+                          example: null
+                        sreward:
+                          type: integer
+                          description: statblock reward? - TO BE CLARIFIED
+                          example: null
+                        mreward:
+                          type: integer
+                          description: microblock reward? - TO BE CLARIFIED
+                          example: null
+                        output:
+                          type: string
+                          description: null for account_in method??? - TO BE CLARIFIED
+                          example: '13118603717'
+                        input:
+                          type: string
+                          description: something for account_in??? - TO BE CLARIFIED
+                          example: 'null'
+                        status:
+                          type: integer
+                          enum: [0, 1, 2, 3]
+                          description: | 
+                            Transaction status - TBC? One of the following statuses is possible:
+                            - 0 - the transaction is accepted by the node, awaiting processing
+                            - 1 - the transaction is a duplicate
+                            - 2 - the transaction was rejected
+                            - 3 - the transaction was confirmed and is successful
+                          example: 3
+                        token_hash:
+                          type: string
+                          description: Hash of the transaction's token
+                          example: '0000000000000000000000000000000000000000000000000000000000000001'
+                        fee_type:
+                          type: integer
+                          description: Fee type |
+                            - 0 - flat fee for owner upon transaction in reward tokens
+                            - 1 - percentage fee in reward tokens
+                            - 2 - fixed fee, charged in native tokens
+                          example: 0
+                        fee_value:
+                          type: integer
+                          description: Transaction fee value in the appropriate tokens
+                          example: 1000000000
+                        fee_min:
+                          type: integer
+                          description: Minimum transaction fee (applies for percentage fees if set)
+                          example: 0
+                        fee:
+                          type: string
+                          description: ??? - Minimum transaction fee (applies for percentage fees if set)
+                          example: '1000000000'
+                  page_count:
+                    type: integer
+                    description: Total page count for the account's reward records
+                    example: 37715
+                  id: 
+                    type: string
+                    description: Account ID (hash)
+                    example: '029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d'
+
 ### PoA - all methods missing!
 ### PoS - some methods available!
 # /get_pos_names:
