@@ -2228,21 +2228,126 @@ paths:
                     data:
                       $ref: '#/components/schemas/Data'
 
+### Account Methods
 
 
+  /account_transactions:
+    get:
+      tags: 
+        - Accounts
+      summary: 'Returns the last 10 transactions of the account with their properties.'
+      description: 'Returns the last 10 transactions of the account with their properties.'
+      parameters: 
+        - name: id
+          in: query
+          required: true
+          description: Address of the account 
+          schema:
+            type: string
+            example: '029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d'
+        - name: page
+          in: query
+          required: true
+          description: 'Page number (0 for the newest one)'
+          schema:
+            type: integer
+            example: 0
+      responses:
+        '200':
+            description: Successfully returned list of the last 10 transactions of the account on the specified page.
+            content:
+              application/json:
+               schema:
+                type: object
+                properties:
+                  balance:
+                    type: string
+                    description: Available balance of the account 
+                    example: '948674304924701184'
+                  total_stake:
+                    type: string
+                    description: Total amount of PoS staked tokens in the network's tokens
+                    example: '96497280000000'
+                  active_total_stake:
+                    type: string
+                    description: TO BE CLARIFIED - Active Total Stake?
+                    example: '416696980000000000'
+                  records:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        i:
+                          type: integer
+                          description: TO BE CLARIFIED - some transaction ID?
+                          example: 3752194
+                        hash:
+                          type: string 
+                          description: Transaction hash.
+                          example: 'fe26b9ccff94295240c923eef89053655bfd206499b4f400d282868476dfea05'
+                        time:
+                          type: integer
+                          description: Transaction timestamp.
+                          example: 1659968280
+                        rectype:
+                          type: string
+                          enum: [iout, iin]
+                          description: Transaction direction (iout = outbound, iin = inbound) 
+                          example: 'iin'
+                        amount: 
+                          type: integer
+                          description: Amount of a transaction
+                          example: 8679532757
+                        data: 
+                          type: string
+                          description: Data field of the transaction (may be empty)
+                          example: '200'
+                        status:
+                          type: integer
+                          enum: [0, 1, 2, 3]
+                          description: | 
+                            Transaction status. One of the following statuses is possible:
+                            - 0 - the transaction is accepted by the node, awaiting processing
+                            - 1 - the transaction is a duplicate
+                            - 2 - the transaction was rejected
+                            - 3 - the transaction was confirmed and is successful
+                          example: 3
+                        token_hash:
+                          type: string
+                          description: Hash of the transaction's token
+                          example: '0000000000000000000000000000000000000000000000000000000000000001'
+                        fee_type:
+                          type: integer
+                          description: Fee type |
+                            - 0 - flat fee for owner upon transaction in reward tokens
+                            - 1 - percentage fee in reward tokens
+                            - 2 - fixed fee, charged in native tokens
+                          example: 0
+                        fee_value:
+                          type: integer
+                          description: Transaction fee value in the appropriate tokens
+                          example: 1000000000
+                        fee_min:
+                          type: integer
+                          description: Minimum transaction fee (applies for percentage fees if set)
+                          example: 0
+                  page_count:
+                    type: integer
+                    description: Total page count for the account's transactions
+                    example: 336734
+                  id: 
+                    type: string
+                    description: Account ID (hash)
+                    example: '029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d'
 ### PoA - all methods missing!
-
 ### PoS - some methods available!
-
-
 # /get_pos_names:
 # /get_top_pos:
 # /get_min_stake:
 # /get_stake_limits: (min, max, default)
 # /referrer_stake:
-
-  /get_pos_total_stake:
-    get:
+/get_pos_total_stake:
+  get:
       tags: 
         - PoS
       summary: 'Returns total stake of PoS nodes.'
@@ -2318,7 +2423,6 @@ paths:
                     type: string
                     description: Contract name.
                     example: Test
-                    
   /get_pos_list_all:
     get:
       tags: 
@@ -2333,6 +2437,22 @@ paths:
                schema:
                 type: object
                 properties:
+                  daily_pos_reward:
+                    type: string
+                    description: Total daily PoS reward amount
+                    example: '96497280000000'
+                  total_stake:
+                    type: string
+                    description: Total amount of PoS staked tokens in the network's tokens
+                    example: '96497280000000'
+                  active_total_stake:
+                    type: string
+                    description: TO BE CLARIFIED - Active Total Stake?
+                    example: '416696980000000000'
+                  effective_total_stake:
+                    type: string
+                    description: TO BE CLARIFIED - Effective Total Stake?
+                    example: '416696980000000000'
                   pos_contracts:
                     type: array
                     items:
