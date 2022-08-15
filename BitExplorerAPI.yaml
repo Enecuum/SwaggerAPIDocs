@@ -2349,7 +2349,7 @@ paths:
         - name: id
           in: query
           required: true
-          description: Address of the account 
+          description: Address of the account b
           schema:
             type: string
             example: '029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d'
@@ -2470,7 +2470,7 @@ paths:
                           example: 1659974762
                         kreward:
                           type: integer
-                          description: macroblock reward? - TO BE CLARIFIED
+                          description: macroblock reward? - PoW macroblock reward, published with them
                           example: null
                         sreward:
                           type: integer
@@ -2478,7 +2478,7 @@ paths:
                           example: null
                         mreward:
                           type: integer
-                          description: microblock reward? - TO BE CLARIFIED
+                          description: microblock reward? - PoA node reward
                           example: null
                         output:
                           type: string
@@ -2640,6 +2640,83 @@ paths:
                     type: string
                     description: Account ID (hash)
                     example: '029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d'
+
+  /balance_all:
+    get:
+      tags:
+        - Account
+      summary: 'Returns the amounts and properties of all tokens the specified account holds'
+      parameters: 
+        - name: id
+          in: query
+          required: true
+          description: Address of the account 
+          schema:
+            type: string
+            example: '029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d'
+      responses:
+        '200':
+          description: Properties of tokens held by the specificed account.
+          content:
+            application/json:
+              schema:
+                properties:
+                  records:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        amount:
+                          type: string
+                          description: Amount of this token held by the account.
+                          example: '930050205493810405'
+                        token:
+                          type: string 
+                          description: Token hash.
+                          example: '0000000000000000000000000000000000000000000000000000000000000001'
+                        ticker:
+                          type: string
+                          description: Ticker of the token.
+                          example: 'BIT'
+                        decimals:
+                          type: integer
+                          description: Number of decimals
+                          example: 10
+                        minable:
+                          type: integer
+                          description: |
+                            0 - non-mineable token
+                            1 - mineable token
+                          enum: [0,1]
+                          example: 1
+                        reissuable:
+                          type: integer
+                          description: |
+                            0 - non-reissuable token
+                            1 - reissuable token token
+                          enum: [0,1]
+                          example: 0
+
+
+### PoA
+
+  /poa_with_stake:
+    get:
+      tags:
+        - PoA
+      summary: 'Returns the amount of accounts that have the minimum balance required for PoA'
+      responses:
+        '200':
+          description: Amount of accounts that have the minimum balance required for PoA.
+          content:
+            application/json:
+              schema:
+                properties:
+                  total:
+                    type: integer
+                    description: 'Amount of accounts that have the minimum balance required for PoA.'
+                    example: 3249
+
 
 ### PoA - all methods missing!
 ### PoS - some methods available!
