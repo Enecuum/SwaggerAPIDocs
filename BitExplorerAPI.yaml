@@ -2644,7 +2644,7 @@ paths:
   /balance_all:
     get:
       tags:
-        - Account
+        - Accounts
       summary: 'Returns the amounts and properties of all tokens the specified account holds'
       parameters: 
         - name: id
@@ -2656,7 +2656,7 @@ paths:
             example: '029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d'
       responses:
         '200':
-          description: Properties of tokens held by the specificed account.
+          description: Properties of tokens held by the specified account.
           content:
             application/json:
               schema:
@@ -2696,6 +2696,89 @@ paths:
                             1 - reissuable token token
                           enum: [0,1]
                           example: 0
+  /balance_mineable:
+    get:
+      tags:
+        - Accounts
+      summary: 'Returns the amounts and properties of all mineable tokens the specified account holds'
+      parameters: 
+        - name: id
+          in: query
+          required: true
+          description: Address of the account 
+          schema:
+            type: string
+            example: '029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d'
+      responses:
+        '200':
+          description: Properties of mineable tokens held by the specified account.
+          content:
+            application/json:
+              schema:
+                properties:
+                  records:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        amount:
+                          type: string
+                          description: Amount of this mineable token held by the account.
+                          example: '930050205493810405'
+                        token:
+                          type: string 
+                          description: Token hash.
+                          example: '0000000000000000000000000000000000000000000000000000000000000001'
+                        ticker:
+                          type: string
+                          description: Ticker of the token.
+                          example: 'BIT'
+                        decimals:
+                          type: integer
+                          description: Number of decimals
+                          example: 10
+
+  /balance_reissuable:
+    get:
+      tags:
+        - Accounts
+      summary: 'Returns the amounts and properties of all reissuable tokens the specified account holds'
+      parameters: 
+        - name: id
+          in: query
+          required: true
+          description: Address of the account 
+          schema:
+            type: string
+            example: '029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d'
+      responses:
+        '200':
+          description: Properties of reissuable tokens held by the specified account.
+          content:
+            application/json:
+              schema:
+                properties:
+                  records:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        amount:
+                          type: integer
+                          description: Amount of this reissuable token held by the account.
+                          example: 100000
+                        token:
+                          type: string 
+                          description: Token hash.
+                          example: '3e45301d62c77c2bf8e96cdae1500b65ec11caaf99a046729bc12aa0c359a7c7'
+                        ticker:
+                          type: string
+                          description: Ticker of the token.
+                          example: 'LP_TKN'
+                        decimals:
+                          type: integer
+                          description: Number of decimals
+                          example: 10
 
 
 ### PoA
