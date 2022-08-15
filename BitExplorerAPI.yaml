@@ -2808,23 +2808,24 @@ paths:
 # /get_min_stake:
 # /get_stake_limits: (min, max, default)
 # /referrer_stake:
-/get_pos_total_stake:
-  get:
-      tags: 
-        - PoS
-      summary: 'Returns total stake of PoS nodes.'
-      description: 'Returns total stake of all the active PoS nodes.'
-      responses:
-        '200':
-          description: Successfully returned total PoS stake.
-          content:
-            application/json:
-             schema:
-              properties:
-                total_stake:
-                  type: integer
-                  description: Total PoS nodes stake. The amount is multiplied by 10^*d*, where *d* stands for the number of decimal places.
-                  example: 13020000000000
+
+  /get_pos_total_stake:
+    get:
+        tags: 
+          - PoS
+        summary: 'Returns total stake of PoS nodes.'
+        description: 'Returns total stake of all active PoS nodes.'
+        responses:
+          '200':
+            description: Successfully returned total PoS stake.
+            content:
+              application/json:
+                schema:
+                  properties:
+                    total_stake:
+                      type: integer
+                      description: Total PoS nodes stake. The amount is multiplied by 10^*d*, where *d* stands for the number of decimal places.
+                      example: 13020000000000
                   
 #  /get_pos_active_total_stake:
 
