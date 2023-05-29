@@ -1,0 +1,2144 @@
+openapi: 3.0.0
+info:
+  version: '1.0.0'
+  title: 'Enecuum Node API'
+  description: |
+    # Introduction
+  
+    Enecuum is a cryptocurrency project designed to involve both mobile and desktop devices into one blockchain network. Enecuum provides a payment platform with the use of a native token. Enecuum's native token, ENQ, can be bought on the exchange, by card, or mined on PCs and smartphones. 
+
+    Below, you can read a short explanation of the basic terms and concepts related to Enecuum and cryptocurrency in general. The description will help you better understand the Enecuum API. **Be aware that the API and its documentation is a work in progress and is constantly updated.** 
+    
+    The methods' parameters and returned values are thoroughly explained in schemas, which you can access by clicking "Schema" next to the "Example Value".
+    
+    # How Enecuum Works
+    
+    When a user creates an account in the Enecuum network, a pair of public and private keys is generated. 
+
+    **The public key** is a user's identification. It is used as a wallet address. The user can safely share the public key to receive payments.
+
+    **The private key** acts as a password. It is used to access the account. The user must never share the private key. The private key needs to be backed up. If a private key is lost, the account will never be recovered.
+    
+    You can read more about the key pair generation in the according section down below.
+    
+    Be aware that any wallet, including the one created for technical purposes, can receive referral rewards. This can happen if someone decides to use the wallet's referral address as their referral agent. These rewards are marked accordingly in the blockchain.
+
+    Enecuum has a native token, ENQ, which is used for payments in the Enecuum network, as well as a non-tradable token BIT designed for testing. Enecuum also allows the issue of custom tokens. Each token has two unique identifiers: ticker and hash. A **ticker** is a 1-6 letter name used for convenience. A **hash** is a 64-character sequence that acts as a technical identification. ENQ has an all-zero token hash (64 zeroes). Non-zero values mean that you deal with an asset other than Enecuum. Custom tokens have a random hexadecimal string as a token ID.
+
+    Each token token has a fixed number of **decimal places**. When using Enecuum API, the methods will return the token amount as an integer. Because of this, the returned amount is multiplied by 10^*d*, where *d* stands for the number of decimal places. For example, ENQ has 10 decimal places. The returned amount 250050000000 correlates with 25.005 ENQ.
+    
+    The tokens are used to perform transactions. After making the request to perform a transaction, it is sent to the main node. Then, it is processed by miners. Finally, the transaction is recorded in the blockchain. **Rejected transactions are also recorded.**
+    
+    <details>
+    <summary> **click to expand**
+    # Enecuum Account Generation 
+    </summary>
+    
+    Enecuum account is a keypair of private and public key. Public key is also used as a Enecuum address. 
+    
+    To create a key pair, we use the secp256k1 elliptic curve. First, a random 32-bytes number is generated, and a public key is generated from it by secp256k1 rules. The received public key in the format 04 + x_coord + y_coord (65 total bytes, 130 symbols in string format) is converted to a compressed public key 02/03 + x_coord (33 total bytes, 66 symbols in string format) depending on the sign of y_coord. Most cryptographic libraries convert a key pair into a standard certificate formats (PEM, PKCS, etc...), but we use a simplified raw private and public key representation.
+    
+    So here is an example of Enecuum account:
+    
+    ```
+    {
+       "prvkey" : "5caf0e01227bc31771dd7ea804c022796da2355452d93396e7e3802f0099f276",
+       "pubkey" : "026f6be1bc2cba807b9e5f22f79df985ff021db77f853a36a200b8dd6a9bd0af9b"
+      }
+    ```
+    
+    You can create an Enecuum BIT network wallet at [bit-wallet.enecuum.com/login](https://bit-wallet.enecuum.com/login).
+    
+    
+    Here is a NodeJS example using standard crypto package:
+    
+    ```
+    const crypto = require('crypto');
+    function gen_keys(){
+       const user = crypto.createECDH('secp256k1');
+       user.generateKeys();
+       return {
+           prvkey : user.getPrivateKey().toString('hex'),
+           pubkey : crypto.ECDH.convertKey(user.getPublicKey().toString('hex'), 'secp256k1', 'hex', 'hex', 'compressed')
+       };
+    }
+    console.log(gen_keys());
+    ```
+    
+    Here is an NodeJS example using elliptic package. Note that you can set a private key by yourself, which can’t be achieved in crypto package by simple steps. You also can use Browserify to use it at client-side.
+    
+    ```
+    let EC = require('elliptic').ec;
+    function gen_keys(prvkey) {
+       let ec = new EC('secp256k1');
+       let key = ec.keyFromPrivate(prvkey, "hex");
+       let pubkey = key.getPublic(true, 'hex');
+       return {
+           prvkey : prvkey,
+           pubkey : pubkey
+       };
+    }
+    let prvkey = '75587f836841d72c7b8bf5b7e514bd4b83dcb9503ed89b0032e519e9a3eaa5f9';
+    console.log(gen_keys(prvkey));
+    ```
+    </details>
+  
+servers:
+  - description: Enecuum BIT Network. New API is first deployed here.
+    url: https://bit.enecuum.com/api/v1
+  - description: Enecuum Pulse Network (main network). Some API methods may be missing.
+    url: https://pulse.enecuum.com/api/v1
+# Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/enecuum/EnecuumNodeAPI/1.0.0
+  
+paths: 
+  /tx:
+    post:
+      tags: 
+        - General
+      summary: 'Performs a transaction.'
+      description: |
+        Performes transaction using the request body. After performing the transaction, its status can be checked with the GET /tx method. In the response body, you can view both successful and unsuccessful results. Click "success" or "error" to access them.
+        
+        The **amount** for transfer needs to be set depending on the number of decimal places the token has. For example, ENQ token has 10 decimal places. To send 25.005 ENQ, the amount needs to be set to 250050000000. 
+        
+        **Data** is used for storing additional information like smart contracts. Can be left empty. Click below to read more about it:
+        
+        <details>
+        <summary> **click to expand**
+        ### Data generation
+        </summary>
+        ## The coding principle of the Data field
+        Enecuum basic contracts are called by transferring the contract parameters to the data field in a normal transaction. 
+        Example:
+
+        ```00920300000b0e00sum007f0f00000e0d00pos_id004807009261818a5c05bf603199e5802f74925ffc0faa8f03742cbd952d403ce5d70cb9000e0d00amount0013090010000000000```
+
+        The data field is a recursive container structure, each chunk is represented as “container length in bytes || data marker || data".
+
+        Container Length is 4 bytes, including container length bytes.
+        Data marker is 4 bytes.
+
+
+        Depending on the data, the appropriate marker should be used:
+   
+        | data| marker|
+        |---|---|
+        | "key" | 0d00 |
+        | "procedure_name" | 0e00|
+        | "parameters" | 0f00 |
+        | "string" | 0700 |
+        | "int" | 0800 |
+        | "bigint" | 0900 |
+        | "create_pos" | 1000 |
+        | "pos_reward" | 1100 |
+        | "transfer" | 1200 |
+        | "delegate" | 0300 |
+        | "undelegate" | 0400 |
+        | "mint" | 1300 |
+        | "burn" | 1400 |
+
+        The contents of the data field can be represented as the structure of nested arrays:
+        ```
+        [
+          ["delegate", [
+            ["procedure_name", "sum"],
+            ["parameters", [
+              ["key", "pos_id"],
+              ["string", "9261818a5c05bf603199e5802f74925ffc0faa8f03742cbd952d403ce5d70cb9"],
+              ["key", "amount"],
+              ["bigint", "10000000000"]
+            ]]
+          ]]
+        ]
+        ```
+
+        Here is the same structure but with the length bytes and type markers:
+        
+        ```
+        00920300
+            000b0e00sum
+            007f0f00
+                000e0d00pos_id
+                004807009261818a5c05bf603199e5802f74925ffc0faa8f03742cbd952d403ce5d70cb9
+                000e0d00amount
+                0013090010000000000
+        ```
+
+        All elements are strings and, in result, are concatenated into one string, which goes to the data field of the transaction.
+
+        ## JavaScript code
+
+        JavaScript code implementation that allows encoding a JSON object of the following form
+
+        ```
+        {
+            type : "contract_type",
+            parameters : {
+                key1 : value1,
+                key2 : value2,
+                key3 : value3
+            }
+        }
+        ```
+
+        It is strongly recommended that you fully use this code, or rewrite it to a preferred programming language.
+
+        ```
+        let schema = {
+            "delegate" :        "0300",
+            "undelegate" :      "0400",
+            "string" :          "0700",
+            "int" :             "0800",
+            "bigint" :          "0900",
+            "object" :          "0c00",
+            "key" :             "0d00",
+            "parameters" :      "0f00",
+            "create_pos" :      "1000",
+            "pos_reward" :      "1100",
+            "transfer" :        "1200",
+            "mint" :            "1300",
+            "burn" :            "1400"
+        };
+
+        function toHex(d) {
+            let hex = Number(d).toString(16);
+            while ((hex.length % 2) !== 0) {
+                hex = "0" + hex;
+            }
+            return hex;
+        }
+        function sizeMarker(size) {
+            let markerSize = 0xFFFF; // Max chunk size
+            if(size > markerSize)
+                throw new OutOfRangeError(`Size can't be bigger than ${markerSize}`);
+            let marker = toHex(size);
+            while (marker.length < 4) {
+                marker = "0" + marker;
+            }
+            return marker;
+        }
+
+        function dataFromObject(obj){
+            let res = {
+                parameters : []
+            };
+            for(let param in obj.parameters){
+                let type = undefined;
+                switch (typeof obj.parameters[param]){
+                    case "bigint" : {
+                        type = "bigint";
+                        break;
+                    }
+                    case "string" : {
+                        type = "string";
+                        break;
+                    }
+                    default : type = "int";
+                }
+                //let type = (typeof obj.parameters[param] === "string") ? "string" : "int";
+                res.parameters.push({key : param, [type] : obj.parameters[param]})
+            }
+            return serialize_object({
+                [obj.type] : res
+            });
+        }
+        function serialize_object(obj){
+            let binary = "";
+            if((!(Array.isArray(obj))) && (typeof obj !== "object"))
+                return obj.toString();
+            if(Array.isArray(obj)){
+                for (let el of obj){
+                    let res = serialize_object(el);
+                    binary += res;
+                }
+            }
+            else {
+                for (let key in obj) {
+                    let code = schema[key];
+                    let res = serialize_object(obj[key]);
+                    binary += sizeMarker(res.length + 8) + code + res;
+                }
+            }
+            return binary;
+        }
+
+        //
+        //  Usage
+        //
+        let data_create_pos = {
+            type : "create_pos",
+            parameters : {
+                fee : 100n,
+                name : "Greatest POS of all time"
+            }
+        };
+        console.log(dataFromObject(data_create_pos));
+
+        let data_delegate = {
+            type : "delegate",
+            parameters : {
+                pos_id : "509a266d46c2f395ff3021f09ddb58d018e60c51ba6dd63f41f8a91a913756d8",
+                amount : 1000000000000n
+            }
+        };
+        console.log(dataFromObject(data_delegate));
+
+        let data_undelegate = {
+            type : "undelegate",
+            parameters : {
+                pos_id : "509a266d46c2f395ff3021f09ddb58d018e60c51ba6dd63f41f8a91a913756d8",
+                amount : 50000000000n
+            }
+        };
+        console.log(dataFromObject(data_undelegate));
+
+        let data_transfer = {
+            type : "transfer",
+            parameters : {
+                undelegate_id : "4c35483b12568727faa910b08bdbe2f882cc5f6ad521930343abeb89658c7282"
+            }
+        };
+        console.log(dataFromObject(data_transfer));
+
+        //Claim reward method.
+        let data_pos_reward = {
+            type : "pos_reward",
+            parameters : {
+                pos_id : "4c35483b12568727faa910b08bdbe2f882cc5f6ad521930343abeb89658c7282"
+            }
+        };
+
+        console.log(dataFromObject(data_pos_reward));
+        ```
+        
+        # Tokens
+        
+        ## mint
+        
+        Increase token emission. Data field parameters:
+        
+        ```
+        {
+             "type": "mint",
+             "parameters": {
+                 "token_hash": "token hash",
+                 "amount": BigInt (10000000000000)
+             }
+        }
+        ```
+        
+        token_hash - hash of the token whose total_supply will be increased
+        
+        amount - the number of coins added to the token's total_supply. Available range of values: 0 ... MAX_SUPPLY_LIMIT
+        
+        The mint contract increases the total_supply of the token by the amount of coins. In this case, coins are credited to the account of the token holder. The contract can only be executed by the owner of the token.
+        
+        Execution of the mint contract is available only if the reissuable = 1 parameter was specified when creating the token.
+        
+        ## burn
+        
+        Reduce token emission. Data field parameters:
+        
+        ```
+        {
+            "type": "burn",
+            "parameters": {
+                "token_hash": "token hash",
+                "amount": BigInt (10000000000000)
+            }
+        }
+        ```
+        
+        token_hash - hash of the token whose total_supply will be reduced
+        
+        amount - the number of coins by which the total_supply token will be reduced. Available range of values: 0 ... <number of tokens on the owner's balance>
+        
+        The burn contract reduces the total_supply of the token by the amount of coins. In this case, the coins are debited from the token holder's account. The contract can only be executed by the owner of the token.
+        
+        Execution of the burn contract is available only if the reissuable = 1 parameter was specified when creating the token.
+        
+        # Contracts
+
+        Contract is a Enecuum transaction with additional data field that contains encoded contract parameters. Every contract type costs as a standard Enecuum transaction
+
+        ## create_pos
+
+        PoS-contract creation.
+        The data field parameters:
+
+        | Data field structure | Types |
+        | ---- | ---- |
+        | { | |
+        |    type : "create_pos",| String, contract type |
+        |    parameters : { } | |
+        |        fee : 100n,| BigInt (0 - 10000) |
+        |        name : “POS validator”| String (1-40 chars) |
+        |    } | |
+        | } |  |
+
+        fee - hundredths of a percent from 0 to 10000. 14% will be 1400;
+        name - POS-contract name
+
+        As a result, a PoS-contract is created. It will be used in other transactions. The hash of this transaction will be used as pos_id in the parameters of other transactions.
+
+        ## delegate
+
+        Delegation of coins, i.e. the act of lending funds to a contract.
+        Parameters of the data field:
+
+        | Data field structure| Types |
+        | ---- | ---- |
+        | { |  |
+        |     type : "delegate",| String, contract type |
+        |     parameters : { |  |
+        |         pos_id : "...",| String |
+        |         amount : 1000000000000n | BigInt (0 - MAX_SUPPLY_LIMIT) |
+        |      } |  |
+        | } |  |
+
+        The specified amount of coins is withdrawn from the sender’s account and is recorded in the delegates table. You can repeat it many times as long as there is available balance.
+        MAX_SUPPLY_LIMIT is a max possible safe integer = 2^64 - 1
+
+        ## undelegate
+
+        “Undelegation” of coins, i.e. the withdrawal of the lent funds.
+        Parameters of the data field:
+
+        | Data field structure| Types |
+        | ---- | ---- |
+        | { |  |
+        | type : "undelegate",| String, contract type |
+        | parameters : { |  |
+        |        pos_id : "...",| String |
+        |        amount : 1000000000000n| BigInt (0 - MAX_SUPPLY_LIMIT) |
+        |    } |  |
+        | } |  |
+        
+        Coins are withdrawn, i.e., the specified amount of coins goes to the undelegates table from the delegates table, creating a separate heap identified by the id of the undelegate transaction.
+
+        ## transfer
+
+        Unlocking coins, i.e., getting undelegated funds back to balance.
+        Parameters of the data field:
+
+        | Data field structure| Types |
+        | ---- | ---- |
+        | { |  |
+        |    type : "transfer",| String, contract type |
+        |    parameters : { |  |
+        |         undelegate_id : "..."| String |
+        |   } |  |
+        | } |  |
+
+
+        Coins from undelegates table are forwarded to balance.
+
+        **Example**: delegate transaction of 100 coins was sent; then, another one was sent, of 100 coins. The balance is decreased by 200 coins.
+
+        Then, the undelegate transactions are sent for 150, 40 and 10 coins. The hashes of these transactions are aaa, bbb, ccc.
+
+        Now, in order to return the funds to the balance, for each undelegate transaction the transfer transaction is sent with the corresponding hash (aaa, bbb or ccc)  in the parameters. That means there will be transactions for 150, 40 and 10 coins instead of one transaction for 200 coins.
+
+        **NB**: transfer transactions will be successful only after 10  blocks have been published after the undelegate transaction. In other cases, the transfer transactions will be rejected.
+
+        # POS rewards
+
+        The PoS-mining rewards are distributed among the one hundred PoS contracts that have the largest stakes, i.e., funds delegated to them. The stake sum of all PoS contracts participating in the PoS mining at a particular moment in time is called a total stake. The total reward for PoS mining is unchanged and amounts to 25% of the total emission. The amount of rewards for a particular contract is calculated as a portion of the total rewards in proportion to the contact stake in relation to total stake. The PoS-contracts rewards are calculated at the time of the macroblock publishing.
+
+        The PoS contract reward is divided into two parts in accordance with the fee parameter specified when creating the contract. The indicated percentage of funds is retained by the creator of the contract. The remaining funds are divided between the contract delegators in proportion to the funds contributed by them.
+
+        Rewards are accrued in arbitrary periods of time (from 1 to 3 days). When calculating rewards, the size of the user's delegated funds at the time of calculation is used.
+
+        The accrual of rewards occurs with every block published. The reward for the PoS owner goes directly to his/her main account. The reward for the delegator goes to his/her special reward balance.
+        To collect the delegator’s reward, the delegator sends the pos_reward transaction. The sender will be charged a standard system fee. 
+
+        To find out more on reward calculation, refer to ETP-4.
+
+        ## pos_reward
+
+        Transfer of coins from a reward balance to the main balance.
+        Parameters of the data field:
+
+        | Data field structure| Types |
+        | ---- | ---- |
+        | { |  |
+        |    type : "pos_reward",| String, contract type |
+        |    parameters : { |  |
+        |        pos_id : "..."| String |
+        |    } |  |
+        | } |  |
+        
+        As a result of the transaction, the entire accumulated PoS reward of the delegator is transferred to his/her main account.
+        </details>
+
+        **Nonce** is a random number from 0 to 2^32. It is involved in a cryptographic communication.
+
+        **Ticker** is a **token hash** which specifies what token needs to be transferred. '0000000000000000000000000000000000000000000000000000000000000000' stands for ENQ. Non-zero values mean that you deal with an asset other than Enecuum. Custom tokens have a random hexadecimal string as a token ID.
+
+        The **signature** needs to be generated using the following JavaScript code:
+        
+        <details>
+        <summary> **click to expand**
+        ### Signature generation </summary>
+        ```
+        const crypto = require('crypto');
+        let KeyEncoder = require('key-encoder').default;
+        let keyEncoder = new KeyEncoder('secp256k1');
+
+        function ecdsa_sign(skey, msg){
+            const sign = crypto.createSign('sha256');
+            try {
+                let pemPrivateKey = keyEncoder.encodePrivate(skey, 'raw', 'pem');
+                sign.write(msg);
+                sign.end();
+                return sign.sign(pemPrivateKey, 'hex');
+            }
+            catch(err){
+                return null;
+            }
+        }
+
+        let hash_tx = function(tx){
+            if (!tx)
+              return undefined;
+
+            let str = ['amount','data','from','nonce','ticker','to'].map(v => crypto.createHash('sha256').update(tx[v].toString().toLowerCase()).digest('hex')).join("");
+            return crypto.createHash('sha256').update(str).digest('hex');
+          }
+
+        // Note: amount is a String
+        let amount = '1000000000000'; 
+        let data = '';
+        let nonce = 438721986634052;
+        let ticker = '0000000000000000000000000000000000000000000000000000000000000000';
+
+        let to_acc = {pubkey:''}; //Recipient's public key.
+        let from_acc = {pubkey:'', 
+                prvkey:''}; //Sender's public and private keys.
+
+        let from = from_acc.pubkey;
+        let to = to_acc.pubkey;    
+
+        let tx = {from, to, amount, nonce, data, ticker};
+
+        console.log(`from public key hash -> ${crypto.createHash('sha256').update(from.toString().toLowerCase()).digest('hex')}`);
+
+        let hash = crypto.createHash('sha256').update(['amount','data','from','nonce','ticker','to'].map(v => crypto.createHash('sha256').update(tx[v].toString().toLowerCase()).digest('hex')).join("")).digest('hex');
+
+        console.log(`all hash -> ${hash}`);
+
+        tx.sign = ecdsa_sign(from_acc.prvkey, hash);
+
+        console.log(tx);
+        ``` 
+        </details>
+        
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  amount:
+                    $ref: '#/components/schemas/Amount'
+                  data:
+                    $ref: '#/components/schemas/Data'
+                  from:
+                    $ref: '#/components/schemas/From'
+                  nonce:
+                    $ref: '#/components/schemas/Nonce'
+                  ticker:
+                    $ref: '#/components/schemas/Token' #TODO: resolve conflict (ticker/token)
+                  to:
+                    $ref: '#/components/schemas/To'
+                  sign:
+                    $ref: '#/components/schemas/Sign'
+      responses:
+        '200':
+          description: Successfully performed transaction.
+          content:
+            application/json:
+              schema:
+                properties:
+                  err:
+                    type: integer
+                    enum: [0,1]
+                    description: 0 means the transaction was successfully processed by the node. 1 means there was a critical error.
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        hash:
+                          type: string
+                          example: 1274fe466eba7af8e012d0d7eb3f3a1d05ce50578529ba4055ece98b96656908
+                        status:
+                          $ref: '#/components/schemas/Status'
+              examples:
+                success:
+                  value:
+                    err: 0
+                    result:
+                      - hash: 4926f30e12f4d997ae931cb862581b20f06e73dd6badd6e90c53acdf2f4a682b
+                        status: 0
+                error:
+                  value:
+                    err: 1
+          
+    get:
+      tags: 
+        - General
+      summary: 'Returns transaction status.'
+      description: |
+        Checks the status of the performed transaction. Additionally, returns the related k-block and m-block hashes. K-blocks and m-blocks are a part of the blockchain architecture. 
+        
+        One of the following transaction **statuses** is possible:
+
+        - 0 means the transaction was accepted by the node and awaits further processing;
+        - 1 means the transaction is a duplicate;
+        - 2 means the transaction was rejected;
+        - 3 means the transaction was successful.
+        
+        The returned **amount** is multiplied by 10^*d*, where *d* stands for the number of decimal places. For example, if the returned amount is 250050000000, the sender meant to transfer 25.005 ENQ.
+      parameters: 
+        - name: hash
+          in: query
+          required: true
+          description: 'Transaction hash.'
+          schema:
+            $ref: '#/components/schemas/Hash'
+      responses:
+        '200':
+            description: Successfully returned transaction status.
+            content:
+              application/json:
+                schema:
+                  properties:
+                    status:
+                      $ref: '#/components/schemas/Status'
+                    from:
+                      $ref: '#/components/schemas/From'
+                    to:
+                      $ref: '#/components/schemas/To'
+                    amount:
+                      $ref: '#/components/schemas/Amount'
+                    ticker:
+                      $ref: '#/components/schemas/Token' #TODO: resolve conflict (ticker/token hash)
+                    data:
+                      $ref: '#/components/schemas/Data'
+                    hash:
+                      $ref: '#/components/schemas/Hash'
+                    kblocks_hash:
+                      type: string 
+                      description: K-block hash. K-blocks contain m-blocks.
+                      example: 00f3f70e530a84a0a6943c15da6db15e3d890a582fb945fc3c2cd9aebd7ebd93
+                    mblocks_hash:
+                      type: string
+                      description: M-block hash. M-blocks contain transactions.
+                      example: a0477381285cdb1815cb7bb939baf9bd1785c76792be82d7a310818189ff9dbd
+  /balance:
+    get:
+      tags: 
+        - General
+      summary: 'Returns wallet balance.'
+      description: 'Returns the token amount held on the specified wallet address if the address exists. If no token is specified, returns ENQ.'
+      parameters: 
+        - name: id
+          in: query
+          required: true
+          description: The wallet address (public key). 
+          schema:
+            type: string
+            example: 029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d
+        - name: token
+          in: query
+          required: false
+          description: 'Token hash.'
+          schema:
+            $ref: '#/components/schemas/Token'
+      responses:
+        '200':
+          description: Successfully returned wallet balance.
+          content:
+            application/json:
+             schema:
+              properties:
+                amount:
+                  $ref: '#/components/schemas/Amount'
+                token:
+                  $ref: '#/components/schemas/Token'
+                ticker:
+                  $ref: '#/components/schemas/Ticker'
+                decimals:
+                  $ref: '#/components/schemas/Decimals'
+                delegated:
+                  type: integer
+                  description: The number of delegated (lent) coins. #TODO: elaborate
+                  example: 0
+                transit:
+                  type: integer
+                  description: The number of coins for transit. #TODO: elaborate
+                  example: 0
+                undelegated:
+                  type: integer
+                  description: The number of undelegated coins. #TODO: elaborate
+                  example: 0
+                reward:
+                  type: integer
+                  description: The number of earned coins. #TODO: elaborate
+                  example: 0
+          
+  /stats:
+    get: 
+      tags: 
+        - General
+      summary: 'Returns network stats.'
+      description: 'Returns network stats. Check response schema for more details.'
+      responses:
+        '200':
+            description: Successfully returned network stats.
+            content:
+              application/json:
+                schema:
+                  properties:
+                    accounts:
+                      type: integer
+                      description: Number of accounts.
+                      example: 2128
+                    apkUrl:
+                      type: integer
+                      description: URL for the latest version Android Masternode App download.
+                      example: 
+                    block_time_24h_avg:
+                      type: integer
+                      description: Average time in seconds between k-block generation in the last 24 hours.
+                      example: 15
+                    block_time_30d_avg:
+                      type: integer
+                      description: Average time in seconds between k-block generation in the last 30 days.
+                      example: 13
+                    block_time_target:
+                      type: integer
+                      description: Targeted time in seconds between k-block generation.
+                      example: 15
+                    calc_rois:
+                      type: integer
+                      description: The balance the PoA node will have after mining for 24 hours with a *calc_stakes* stake.
+                      example: 250008797842
+                    calc_stakes:
+                      type: integer
+                      description: The stake that is used to calculate *calc_rois*.
+                      example: 250000000000
+                    cashier_ptr:
+                      type: integer
+                      description: Block hash that is used for cashier calculation.
+                      example: 6
+                    cg_btc:
+                      type: number
+                      description: Current ENQ value in BTC based on [CoinGecko](https://www.coingecko.com/en/coins/enecuum).
+                      example: 0.00000122
+                    cg_eth:
+                      type: number
+                      description: Current ENQ value in ETH based on [CoinGecko](https://www.coingecko.com/en/coins/enecuum).
+                      example: 0.00004273
+                    cg_usd:
+                      type: number
+                      description: Current ENQ value in USD based on [CoinGecko](https://www.coingecko.com/en/coins/enecuum).
+                      example: 0.01615963
+                    csup:
+                      type: integer
+                      description: ENQ circulating supply, i.e., the total ENQ supply minus [team wallet](https://pulse.enecuum.com/#!/account/0270a88ea6f7c5ea2a2ec3878008d878a70fd5d4ca27d5866d0eec3594cab0b912/0) and [fund wallet](https://pulse.enecuum.com/#!/account/026df0aa41967d8d47082c36b29a164aa1c90cdd07cb02d373daaba90b8eca5301/0). The returned value is multiplied by 10^10.
+                      example: 3407411488880000000
+                    difficulty:
+                      type: number
+                      description: Mining difficulty.
+                      example: 9.69
+                    engaged_balance:
+                      type: integer
+                      description: Total stakes of PoA and PoS nodes. The returned value is multiplied by 10^10.
+                      example: 3272847385977657300
+                    full_count:
+                      type: integer
+                      description: Number of active Full nodes.
+                      example: 2
+                    height:
+                      $ref: '#/components/schemas/Height'
+                    indexer_ptr:
+                      type: integer
+                      description: Block hash that is used by the explorer.
+                      example: 0
+                    maxApkVersion:
+                      type: integer
+                      description: This is used for auto updating of Enecuum Masternode Android app.
+                      example: 0
+                    max_stake:
+                      type: integer
+                      description: PoA stake threshold. Having greater stake results in no additional rewards. The returned value is multiplied by 10^10.
+                      example: 250000000000000
+                    max_tps:
+                      type: integer
+                      description: Current maximum number of transactions per second. This is NOT the maximum possible TPS for Enecuum.
+                      example: 17
+                    minApkVersion:
+                      type: integer
+                      description: Minimum version of Enecuum Android App required for mining.
+                      example: 0
+                    min_stake:
+                      $ref: '#/components/schemas/MinStake'
+                    network_hashrate:
+                      type: integer
+                      description: Network hashrate in hashes per second.
+                      example: 826
+                    poa_capable_count:
+                      type: integer
+                      description: The number of PoA accounts capable of mining, i.e., with  available balance of at least minimum stake.
+                      example: 2109
+                    poa_count:
+                      type: integer
+                      description: Number of active PoA nodes.
+                      example: 648
+                    pos_active_count:
+                      type: integer
+                      description: Number of PoS contracts that have received rewards in the last X blocks (the value may be different, currently X = 5760).
+                      example: 1
+                    pos_count:
+                      type: integer
+                      description: Number of active PoS nodes.
+                      example: null
+                    pos_total_count:
+                      type: integer
+                      description: Number of all PoS contracts.
+                      example: 23
+                    pow_count:
+                      type: integer
+                      description: Number of active PoW nodes.
+                      example: 1
+                    proposed_inflation:
+                      type: integer
+                      description: Proposed inflation calculated as yearly rewards divided by total supply.
+                      example: 0
+                    referrer_stake:
+                      $ref: '#/components/schemas/ReferrerStake'
+                    reward_poa:
+                      type: integer
+                      description: Rewards received by PoA nodes in the last 24 hours. The returned value is multiplied by 10^10.
+                      example: 1016375584599730
+                    reward_pos:
+                      type: integer
+                      description: Rewards received by PoS nodes in the last 24 hours. The returned value is multiplied by 10^10.
+                      example: 291775352000000
+                    reward_pow:
+                      type: integer
+                      description: Rewards received by PoW nodes in the last 24 hours. The returned value is multiplied by 10^10.
+                      example: 26525032000000
+                    total_daily_pos_stake:
+                      type: integer
+                      description: TODO.
+                      example: 0
+                    total_daily_stake:
+                      type: integer
+                      description: Total PoA nodes stake. The returned value is multiplied by 10^10.
+                      example: 3272841444722907600
+                    tps:
+                      type: integer
+                      description: Transactions per second.
+                      example: 0
+                    tsup:
+                      type: integer
+                      description: ENQ total supply. The returned value is multiplied by 10^10.
+                      example: 1901936042160000000
+                    txfee_daily_30d_avg:
+                      type: integer
+                      description: Average transaction fees in the last 30 days.
+                      example: 28560
+                    txfee_hourly_24h_avg:
+                      type: integer
+                      description: Average transaction fees in the last 24 hours.
+                      example: 2071
+  /height:
+    get: 
+      tags: 
+        - General
+      summary: 'Returns blockchain height.'
+      description: 'Returns the last block number, i.e., the total number of blocks in the blockchain. The block count starts with 0.'
+      responses:
+        '200':
+            description: Successfully returned block height.
+            content:
+              application/json:
+                schema:
+                  properties:
+                    height:
+                      $ref: '#/components/schemas/Height'
+                      
+  /macroblock:
+    get: 
+      tags: 
+        - General
+      summary: 'Returns contents of a macroblock.'
+      description: 'Returns k-block, microblocks and s-blocks attached to it. Microblock hashes are sorted lexicographically in hexadecimal format.'
+      parameters:
+        - name: hash
+          in: query
+          required: true
+          description: 'Macroblock/k-block hash.'
+          example: 0028caa83e2cba8d32e6448130805f168d9348218ce37d7d35993ad050b7952b
+          schema:
+            $ref: '#/components/schemas/Hash'
+      responses:
+        '200':
+          description: Successfully returned macroblock content.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  kblock:
+                    type: object
+                    description: 'K-block content. A macroblock can contain only one k-block.'
+                    properties:
+                      hash: 
+                        allOf:
+                          - $ref: '#/components/schemas/Hash'
+                          - example: 0028caa83e2cba8d32e6448130805f168d9348218ce37d7d35993ad050b7952b
+                      n:
+                        type: integer
+                        description: 'Height of the macroblock.' 
+                        example: 5211
+                      time:
+                        type: integer
+                        description: 'K-block publishing time in Unix Time format.' 
+                        example: 1592385962
+                      publisher:
+                        type: string
+                        description: 'Public key of a k-block publisher.' 
+                        example: 034b4875bf08ffd5a4f0b06c21f951aa3e2f979d2d9f1bb4a64e0600eac2350beb
+                      nonce:
+                        allOf:
+                          - $ref: '#/components/schemas/Nonce'
+                          - example: 41
+                      link:
+                        type: string
+                        description: 'Previous k-block hash.' 
+                        example: 00fb459c1f8de0b24d074641a76878ab9528acaf62a9a33a0d9874a92e3349b5
+                      sprout:
+                        type: string
+                        description: 'Merkle tree top hash.' 
+                        example: BITGENESIS
+                      m_root:
+                        type: string
+                        description: 'Merkle tree root.' 
+                        example: 61b80791bfdd95cf958b3eb21412dc15634f15b5e692e68401abdf9b1d794135
+                      reward:
+                        type: integer
+                        description: 'Reward for k-block mining.' 
+                        example: 15449600000
+                      target_diff:
+                        type: integer
+                        description: 'Hash calculation difficulty.' 
+                        example: 141304204
+                  mblocks:
+                    type: array
+                    description: 'Microblock content. There can be multiple microblocks. In each microblock, there can be multiple transactions.'
+                    items:
+                      type: object
+                      properties:
+                        hash:
+                          $ref: '#/components/schemas/Hash'
+                        tx_cnt:
+                          type: integer
+                          description: 'The amount of transactions in a microblock.'
+                    example:
+                      - hash: bfac67dcb2f2b7a8275f0787c8c98f356b6a51635de61bc981c0eec386453fe7
+                        tx_cnt: 3
+                      - hash: caa23e95b2cd0f11f5713a340309c1148a9519c4178330f03e95a82b612758bb
+                        tx_cnt: 3
+                  sblocks:
+                    type: array
+                    description: 'Statblock content. There can be multiple statblocks.'
+                    items:
+                      type: object
+                      properties:
+                        hash:
+                          $ref: '#/components/schemas/Hash'
+                    example:
+                      - hash: 57c5d28b3e82508a873d0c311aeabdc87642e6f6802196110a7c0146f6fb9991
+                    
+  /macroblock_by_height:
+    get:
+      tags:
+        - General
+      summary: 'Returns macroblock info by its height.'
+      description: 'Returns k-block, microblocks and s-blocks attached to it. Microblock hashes are sorted lexicographically in hexadecimal format.'
+      parameters:
+        - name: height
+          in: query
+          required: true
+          description: 'Block number (height)'
+          schema:
+            type: integer
+            example: 5211
+      responses:
+        '200':
+          description: Successfully returned macroblock content.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  kblock:
+                    type: object
+                    description: 'K-block content. A macroblock can contain only one k-block.'
+                    properties:
+                      hash: 
+                        allOf:
+                          - $ref: '#/components/schemas/Hash'
+                          - example: 0028caa83e2cba8d32e6448130805f168d9348218ce37d7d35993ad050b7952b
+                      n:
+                        type: integer
+                        description: 'Height of the macroblock.' 
+                        example: 5211
+                      time:
+                        type: integer
+                        description: 'K-block publishing time in Unix Time format.' 
+                        example: 1592385962
+                      publisher:
+                        type: string
+                        description: 'Public key of a k-block publisher.' 
+                        example: 034b4875bf08ffd5a4f0b06c21f951aa3e2f979d2d9f1bb4a64e0600eac2350beb
+                      nonce:
+                        allOf:
+                          - $ref: '#/components/schemas/Nonce'
+                          - example: 41
+                      link:
+                        type: string
+                        description: 'Previous k-block hash.' 
+                        example: 00fb459c1f8de0b24d074641a76878ab9528acaf62a9a33a0d9874a92e3349b5
+                      sprout:
+                        type: string
+                        description: 'Merkle tree top hash.' 
+                        example: BITGENESIS
+                      m_root:
+                        type: string
+                        description: 'Merkle tree root.' 
+                        example: 61b80791bfdd95cf958b3eb21412dc15634f15b5e692e68401abdf9b1d794135
+                      reward:
+                        type: integer
+                        description: 'Reward for k-block mining.' 
+                        example: 15449600000
+                      target_diff:
+                        type: integer
+                        description: 'Hash calculation difficulty.' 
+                        example: 141304204
+                  mblocks:
+                    type: array
+                    description: 'Microblock content. There can be multiple microblocks. In each microblock, there can be multiple transactions.'
+                    items:
+                      type: object
+                      properties:
+                        hash:
+                          $ref: '#/components/schemas/Hash'
+                        tx_cnt:
+                          type: integer
+                          description: 'The amount of transactions in a microblock.'
+                    example:
+                      - hash: bfac67dcb2f2b7a8275f0787c8c98f356b6a51635de61bc981c0eec386453fe7
+                        tx_cnt: 3
+                      - hash: caa23e95b2cd0f11f5713a340309c1148a9519c4178330f03e95a82b612758bb
+                        tx_cnt: 3
+                  sblocks:
+                    type: array
+                    description: 'Statblock content. There can be multiple statblocks.'
+                    items:
+                      type: object
+                      properties:
+                        hash:
+                          $ref: '#/components/schemas/Hash'
+                    example:
+                      - hash: 57c5d28b3e82508a873d0c311aeabdc87642e6f6802196110a7c0146f6fb9991   
+  /mblock:
+    get:
+      tags: 
+        - General
+      summary: 'Returns contents of a microblock.'
+      description: 'Returns microblock transactions and header. A microblock is a part of a macroblock. Microblocks contain transactions, which are sorted lexicographically by hexadecimal hash.'
+      parameters: 
+        - name: hash
+          in: query
+          required: true
+          description: 'Microblock hash.'
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Hash'
+              - example: 1995c5e96b615d217957aefe7548017e81c50880036b887dce8ea487e1f90cca
+      responses:
+        '200':
+          description: Successfully returned microblock contents.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transactions:
+                    type: array
+                    description: 'Transaction content. There can be multiple transactions.'
+                    items:
+                      type: object
+                      properties:
+                        hash:
+                          $ref: '#/components/schemas/Hash'
+                        from:
+                          $ref: '#/components/schemas/From'
+                        to:
+                          $ref: '#/components/schemas/To'
+                        amount:
+                          $ref: '#/components/schemas/Amount'
+                        mblocks_hash:
+                          type: string
+                          description: M-block hash. M-blocks contain transactions.
+                          example: a0477381285cdb1815cb7bb939baf9bd1785c76792be82d7a310818189ff9dbd
+                        nonce:
+                          $ref: '#/components/schemas/Nonce'
+                        status:
+                          $ref: '#/components/schemas/Status'
+                        sign:
+                          $ref: '#/components/schemas/Sign'
+                        ticker:
+                          $ref: '#/components/schemas/Token' 
+                        data:
+                          $ref: '#/components/schemas/Data'
+                  header:
+                    type: object
+                    description: 'Microblock header.'
+                    properties:
+                      kblocks_hash: 
+                        allOf:
+                          - $ref: '#/components/schemas/Hash'
+                          - example: 007bbe8c1256915d5ebdc51ff9cec9792d79b2d533832e5fe203129cb949360f
+                      publisher:
+                        type: string
+                        description: 'Public key of a k-block publisher.' 
+                        example: 034b4875bf08ffd5a4f0b06c21f951aa3e2f979d2d9f1bb4a64e0600eac2350beb
+                      referrer:
+                        type: string
+                        description: 'Public key of a referrer. Can be null.' 
+                        nullable: true
+                        example: null
+                      mblocks_hash:
+                        allOf:
+                          - $ref: '#/components/schemas/Hash'
+                          - example: fb263c111d0b07afb2fb0125f7e1b48060d4b24eaeef83afed9d570b5cbc0f09
+                      reward:
+                        type: integer
+                        description: 'A reward for the microblock publication.' 
+                        example: 4387962285
+                      nonce:
+                        $ref: '#/components/schemas/Nonce'
+                      token:
+                        $ref: '#/components/schemas/Token'
+
+  /sblock:
+    get:
+      tags: 
+        - General
+      summary: 'Returns contents of a statblock.'
+      description: 'Returns statblock header. A statblock is a part of a macroblock.'
+      parameters: 
+        - name: hash
+          in: query
+          required: true
+          description: 'Statblock hash.'
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Hash'
+              - example: f6503f7f6388e53a0284f641c1872b61b62bcec3adb5420d430c2676455d4c2b
+      responses:
+        '200':
+            description: Successfully returned statblock contents.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    header:
+                      type: object
+                      properties:
+                        kblocks_hash: 
+                          allOf:
+                            - $ref: '#/components/schemas/Hash'
+                            - example: 007bbe8c1256915d5ebdc51ff9cec9792d79b2d533832e5fe203129cb949360f
+                        publisher:
+                          type: string
+                          description: 'Public key of a k-block publisher.' 
+                          example: 034b4875bf08ffd5a4f0b06c21f951aa3e2f979d2d9f1bb4a64e0600eac2350beb
+                        sblocks_hash:
+                          $ref: '#/components/schemas/Hash'
+                        reward:
+                          type: integer
+                          description: 'A reward for the statblock publication.' 
+                          example: 4387962285
+  /token_info:
+    get: 
+      tags: 
+        - Token
+      summary: 'Returns information about the token.'
+      description: 'Returns general information about the token. Multiple examples of possible responses can be chosen below. The description of the response can be found in the response schema.'
+      parameters: 
+        - name: hash
+          in: query
+          required: true
+          description: 'Token hash.'
+          schema:
+            $ref: '#/components/schemas/Token'
+      responses:
+        '200':
+            description: Successfully returned token info.
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      hash:
+                        $ref: '#/components/schemas/Token'
+                      owner:
+                        $ref: '#/components/schemas/Owner'
+                      fee_type:
+                        type: integer
+                        description: |
+                          One of the following fee types is possible:
+                          - 0 means flat fee;
+                          - 1 means percent fee.
+                        enum: [0,1]
+                        example: 0
+                      fee_value:
+                        type: integer
+                        description: For flat fee, the fee amount is multiplied by 10^*d*, where *d* stands for the number of decimal places. For percent fee, the fee amount is multiplied by 100.
+                        example: 100000000
+                      fee_min:
+                        type: integer
+                        description: The minimum flat fee in case the token uses percent fee. 
+                        example: 100000000
+                      ticker:
+                        $ref: '#/components/schemas/Ticker'
+                      decimals:
+                        $ref: '#/components/schemas/Decimals'
+                      total_supply:
+                        type: integer
+                        description: The token emission. The amount is multiplied by 10^*d*, where *d* stands for the number of decimal places. 
+                        example: 3383481700000000000
+                      caption:
+                        type: string
+                        description: A 0-40 character token description. Can be empty.
+                        example: Enecuum testnet coin
+                      active:
+                        type: integer
+                        description: |
+                          One of the following statuses is possible:
+                          - 0 means inactive;
+                          - 1 means active.
+                        enum: [0,1]
+                        example: 1
+                      reissuable:
+                        $ref: '#/components/schemas/Reissuable'
+                      minable:
+                        $ref: '#/components/schemas/Minable'
+                      max_supply:
+                        type: integer
+                        description: A maximum token emission. Upon reaching this number, the token can no longer be mined.
+                        example: 9000000000000000000
+                      block_reward:
+                        type: integer
+                        description: A reward for each mined macroblock. This number includes the referral reward.
+                        example: 96560000000
+                      min_stake:
+                        $ref: '#/components/schemas/MinStake'
+                      referrer_stake:
+                        $ref: '#/components/schemas/ReferrerStake'
+                      ref_share:
+                        type: integer
+                        description: A share of the total block reward that determines the referral reward amount. The referral reward is distributed among the referral and their agent equally
+                        example: 1000
+                examples:
+                  reissuable:
+                    description: Tokens with a flexible supply. After the token release, its supply can be changed by issuing or burning of coins.
+                    value:
+                      - hash: "0000000000000000000000000000000000000000000000000000000000000000"
+                        owner: 029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d
+                        fee_type: 0
+                        fee_value: 100000000
+                        fee_min: 0
+                        ticker: BIT
+                        decimals: 10
+                        total_supply: 3493999410335106560
+                        caption: Enecuum testnet BIT
+                        active: 0
+                        reissuable: 1
+                        minable: 0
+                        max_supply: null
+                        block_reward: null
+                        min_stake: null
+                        referrer_stake: null
+                        ref_share: null
+                  non-reissuable:
+                    description: Tokens with a fixed supply. After the token release, extra token coins can not be emitted.
+                    value:
+                      - hash: "0000000000000000000000000000000000000000000000000000000000000000"
+                        owner: 029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d
+                        fee_type: 0
+                        fee_value: 100000000
+                        fee_min: 0
+                        ticker: BIT
+                        decimals: 10
+                        total_supply: 3493999410335106560
+                        caption: Enecuum testnet BIT
+                        active: 0
+                        reissuable: 0
+                        minable: 0
+                        max_supply: null
+                        block_reward: null
+                        min_stake: null
+                        referrer_stake: null
+                        ref_share: null
+                  mineable:
+                    description: Tokens that can be mined. Some volume is selected for instant release (pre-mine), and the rest is mined by users.
+                    value:
+                      - hash: "0000000000000000000000000000000000000000000000000000000000000000"
+                        owner: 029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d
+                        fee_type: 0
+                        fee_value: 100000000
+                        fee_min: 0
+                        ticker: BIT
+                        decimals: 10
+                        total_supply: 3493999410335106560
+                        caption: Enecuum testnet BIT
+                        active: 0
+                        reissuable: 0
+                        minable: 1
+                        max_supply: 9000000000000000000
+                        block_reward: 96560000000
+                        min_stake: 250000000000
+                        referrer_stake: 10000000000000
+                        ref_share: 1000
+                        
+  /get_tokens_by_owner:
+    get:
+      tags: 
+        - Token
+      summary: 'Returns tokens by owner.'
+      description: 'Returns a list of tokens of the specified wallet.'
+      parameters: 
+        - name: owner
+          in: query
+          required: true
+          description: 'Token owner address.'
+          schema:
+            $ref: '#/components/schemas/Owner'
+      responses:
+        '200':
+            description: Successfully returned a list of tokens by owner.
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      token_hash:
+                        $ref: '#/components/schemas/Token'
+                      total_supply:
+                        type: integer
+                        description: A token supply at the time of the issue. 
+                        example: 9510000000000
+                      fee_type:
+                        type: integer
+                        description: Determines whether the fee is fixed or percentage. 0 means fixed, 1 means percentage. 
+                        example: 0
+                      fee_value:
+                        type: integer
+                        description: An exact fee amount for token transactions. If the fee is fixed, the value is multiplied by 10^*d*, where *d* stands for the number of decimal places. If the fee is percentage, the value is multiplied by 100 (e.g. a 1% fee is returned as 100). 
+                        example: 10000000000
+                      fee_min:
+                        type: integer
+                        description: A minimum fee for token transactions if the token type is percentage. For fixed fees, fee_min equals fee_value.
+                        example: 10000000000
+                      reissuable:
+                        $ref: '#/components/schemas/Reissuable'
+                      minable:
+                        $ref: '#/components/schemas/Minable'
+                        
+  /get_pos_total_stake:
+    get:
+      tags: 
+        - PoS
+      summary: 'Returns total stake of PoS nodes.'
+      description: 'Returns total stake of all the active PoS nodes.'
+      responses:
+        '200':
+          description: Successfully returned total PoS stake.
+          content:
+            application/json:
+             schema:
+              properties:
+                total_stake:
+                  type: integer
+                  description: Total PoS nodes stake. The amount is multiplied by 10^*d*, where *d* stands for the number of decimal places.
+                  example: 13020000000000
+                  
+  /get_pos_list_count:
+    get:
+      tags: 
+        - PoS
+      summary: 'Returns the number of PoS contracts.'
+      description: 'Returns the total number of PoS contracts.'
+      responses:
+        '200':
+          description: Successfully returned PoS contract number.
+          content:
+            application/json:
+              schema:
+                properties:
+                  count:
+                    type: integer
+                    description: The number of PoS contracts.
+                    example: 14
+                  
+  /get_pos_list:
+    get:
+      tags: 
+        - PoS
+      summary: 'Returns PoS contracts of the specific node.'
+      description: 'Returns a list of PoS contracts of the specified contract owner.'
+      parameters: 
+        - name: owner
+          in: query
+          required: true
+          description: Contract owner public key. 
+          schema:
+            $ref: '#/components/schemas/Owner'
+      responses:
+        '200':
+          description: Successfully returned PoS contract list.
+          content:
+            application/json:
+             schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  rank:
+                    type: integer
+                    description: PoS contract rating number. The higher stake power gets the higher rank.
+                    example: 1
+                  pos_id:
+                    $ref: '#/components/schemas/PosID'
+                  owner:
+                    $ref: '#/components/schemas/Owner'
+                  fee:
+                    $ref: '#/components/schemas/Fee'
+                  stake:
+                    $ref: '#/components/schemas/Stake'
+                  name:
+                    type: string
+                    description: Contract name.
+                    example: Test
+                    
+  /get_pos_list_all:
+    get:
+      tags: 
+        - PoS
+      summary: 'Returns all PoS contracts.'
+      description: 'Returns all PoS contracts.'
+      responses:
+        '200':
+          description: Successfully returned PoS contract list.
+          content:
+            application/json:
+               schema:
+                type: object
+                properties:
+                  pos_contracts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        rank:
+                          type: integer
+                          description: PoS contract rating number. As stake power increases, so does the rank.
+                          example: 1
+                        active:
+                          type: integer
+                          enum: [0,1]
+                          description: 0 means node is inactive. 1 means node is active. PoS node is considered active if it has generated at least 1 s-block for the last 100 blocks.
+                          example: 1
+                        pos_id:
+                          $ref: '#/components/schemas/PosID'
+                        owner:
+                          $ref: '#/components/schemas/Owner'
+                        fee:
+                          $ref: '#/components/schemas/Fee'
+                        stake:
+                          $ref: '#/components/schemas/Stake'
+                        stake_power:
+                          $ref: '#/components/schemas/StakePower'
+                        active_stake_power:
+                          type: integer
+                          description: Contract stake to active PoS stake ratio.
+                          example: 1
+                        roi:
+                          type: integer
+                          description: Return on investment. Measures the gain generated on an investment relative to the amount of coins delegated.
+                          example: 7519
+                        active_stake_share:
+                          type: integer
+                          description: |
+                            Used for inactive nodes. Formula: stake / (active_total_stake + stake)
+                          example: 0
+                        uptime:
+                          type: integer
+                          description: Node performance. Measures system reliability, expressed as the percentage of time a node has been working.
+                          example: 1
+                  
+  /get_delegators_list:
+    get:
+      tags: 
+        - PoS
+      summary: 'Returns a list of contract delegators.'
+      description: 'Returns a list of contract delegators.'
+      parameters: 
+        - name: pos_id
+          in: query
+          required: true
+          description: Transaction hash of PoS contract creation. 
+          schema:
+            $ref: '#/components/schemas/PosID'
+      responses:
+        '200':
+          description: Successfully returned contract delegator list.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    pos_id:
+                      $ref: '#/components/schemas/PosID'
+                    delegator:
+                      type: string
+                      description: Delegator public key.
+                      example: 0242d441a4b35d190d6b75a64e070bec4bc671d20f3ac10259106b93b3766c5593
+                    amount:
+                      type: integer
+                      description: The total number of delegated coins. The amount is multiplied by 10^*d*, where *d* stands for the number of decimal places. 
+                      example: 10000000000
+                    reward:
+                      type: integer
+                      description: The number of earned coins. #TODO: elaborate
+                      example: 0
+
+                  
+  /get_transfer_lock:
+    get:
+      tags: 
+        - PoS
+      summary: 'Returns asset lock duration.'
+      description: 'Returns asset lock duration.' #TODO: elaborate
+      responses:
+        '200':
+          description: Successfully returned transfer lock.
+          content:
+            application/json:
+             schema:
+              properties:
+                transfer_lock:
+                  type: integer
+                  description: Transfer lock duration. #TODO: elaborate
+                  example: 5
+                  
+  /get_pos_list_page:
+    get:
+      deprecated: true
+      tags: 
+        - PoS
+      summary: 'Returns a detailed PoS contract list.'
+      description: 'Returns a list of 20 PoS contracts with detailed information about them. The increment of the *page* parameter skips to the next list 20 PoS contracts. The contracts are sorted by the stake power, i.e., the contract stake to total stake ratio. The returned *page_count* shows the page number as if it appeared on a web site.'
+      parameters: 
+        - name: page
+          in: query
+          required: true
+          description: Page number. Starts with 0.
+          schema:
+            type: integer
+            example: 0
+      responses:
+        '200':
+          description: Successfully returned a list of PoS contracts.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pos_contracts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        rank:
+                          type: integer
+                          description: PoS contract rating number. The higher stake power gets the higher rank.
+                          example: 1
+                        pos_id:
+                          $ref: '#/components/schemas/PosID'
+                        owner:
+                          $ref: '#/components/schemas/Owner'
+                        fee:
+                          $ref: '#/components/schemas/Fee'
+                        stake:
+                          $ref: '#/components/schemas/Stake'
+                        stake_power:
+                          $ref: '#/components/schemas/StakePower'
+                  page_count:
+                    type: integer
+                    description: Page number. Starts with 1.
+                    example: 1
+      
+components:
+  schemas:
+    Status:
+      type: integer
+      description: |
+        One of the following transaction statuses is possible:
+        - 0 means the transaction was accepted by the node and awaits further processing;
+        - 1 means the transaction is a duplicate;
+        - 2 means the transaction was rejected;
+        - 3 means the transaction was successful.
+      enum: [0,1,2,3]
+      example: 3
+      
+    Amount:
+      type: string
+      description: Token amount multiplied by 10^*d*, where *d* stands for the number of decimal places. ENQ token has 10 decimals. 
+      example: "3235065616839973400"
+        
+    To:
+      type: string
+      description: Recipient's public key.
+      example: 029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d
+      
+    From:
+      type: string
+      description: Sender's public key.
+      example: 034b4875bf08ffd5a4f0b06c21f951aa3e2f979d2d9f1bb4a64e0600eac2350beb
+      
+    Data:
+      type: string
+      description: |
+        Used for storing additional info like smart contract. Can be left empty.
+              
+        # Data field generation
+              
+        ## The coding principle of the Data field
+        Enecuum basic contracts are called by transferring the contract parameters to the data field in a normal transaction. 
+        Example:
+
+        ```00920300000b0e00sum007f0f00000e0d00pos_id004807009261818a5c05bf603199e5802f74925ffc0faa8f03742cbd952d403ce5d70cb9000e0d00amount0013090010000000000```
+
+        The data field is a recursive container structure, each chunk is represented as “container length in bytes || data marker || data".
+
+        Container Length is 4 bytes, including container length bytes.
+        Data marker is 4 bytes.
+
+
+        Depending on the data, the appropriate marker should be used:
+   
+        | data| marker|
+        |---|---|
+        | "key" | 0d00 |
+        | "procedure_name" | 0e00|
+        | "parameters" | 0f00 |
+        | "string" | 0700 |
+        | "int" | 0800 |
+        | "bigint" | 0900 |
+        | "create_pos" | 1000 |
+        | "pos_reward" | 1100 |
+        | "transfer" | 1200 |
+        | "delegate" | 0300 |
+        | "undelegate" | 0400 |
+        | "mint" | 1300 |
+        | "burn" | 1400 |
+
+        The contents of the data field can be represented as the structure of nested arrays:
+        ```
+        [
+          ["delegate", [
+            ["procedure_name", "sum"],
+            ["parameters", [
+              ["key", "pos_id"],
+              ["string", "9261818a5c05bf603199e5802f74925ffc0faa8f03742cbd952d403ce5d70cb9"],
+              ["key", "amount"],
+              ["bigint", "10000000000"]
+            ]]
+          ]]
+        ]
+        ```
+
+        Here is the same structure but with the length bytes and type markers:
+
+        00920300
+            000b0e00sum
+            007f0f00
+                000e0d00pos_id
+                004807009261818a5c05bf603199e5802f74925ffc0faa8f03742cbd952d403ce5d70cb9
+                000e0d00amount
+                0013090010000000000
+
+        All elements are strings and, in result, are concatenated into one string, which goes to the data field of the transaction.
+
+        ## JavaScript code
+
+        JavaScript code implementation that allows encoding a JSON object of the following form
+
+        ```
+        {
+            type : "contract_type",
+            parameters : {
+                key1 : value1,
+                key2 : value2,
+                key3 : value3
+            }
+        }
+        ```
+
+        It is strongly recommended that you fully use this code, or rewrite it to a preferred programming language.
+
+        ```
+        let schema = {
+            "delegate" :        "0300",
+            "undelegate" :      "0400",
+            "string" :          "0700",
+            "int" :             "0800",
+            "bigint" :          "0900",
+            "object" :          "0c00",
+            "key" :             "0d00",
+            "parameters" :      "0f00",
+            "create_pos" :      "1000",
+            "pos_reward" :      "1100",
+            "transfer" :        "1200"
+        };
+
+        function toHex(d) {
+            let hex = Number(d).toString(16);
+            while ((hex.length % 2) !== 0) {
+                hex = "0" + hex;
+            }
+            return hex;
+        }
+        function sizeMarker(size) {
+            let markerSize = 0xFFFF; // Max chunk size
+            if(size > markerSize)
+                throw new OutOfRangeError(`Size can't be bigger than ${markerSize}`);
+            let marker = toHex(size);
+            while (marker.length < 4) {
+                marker = "0" + marker;
+            }
+            return marker;
+        }
+
+        function dataFromObject(obj){
+            let res = {
+                parameters : []
+            };
+            for(let param in obj.parameters){
+                let type = undefined;
+                switch (typeof obj.parameters[param]){
+                    case "bigint" : {
+                        type = "bigint";
+                        break;
+                    }
+                    case "string" : {
+                        type = "string";
+                        break;
+                    }
+                    default : type = "int";
+                }
+                //let type = (typeof obj.parameters[param] === "string") ? "string" : "int";
+                res.parameters.push({key : param, [type] : obj.parameters[param]})
+            }
+            return serialize_object({
+                [obj.type] : res
+            });
+        }
+        function serialize_object(obj){
+            let binary = "";
+            if((!(Array.isArray(obj))) && (typeof obj !== "object"))
+                return obj.toString();
+            if(Array.isArray(obj)){
+                for (let el of obj){
+                    let res = serialize_object(el);
+                    binary += res;
+                }
+            }
+            else {
+                for (let key in obj) {
+                    let code = schema[key];
+                    let res = serialize_object(obj[key]);
+                    binary += sizeMarker(res.length + 8) + code + res;
+                }
+            }
+            return binary;
+        }
+
+        //
+        //  Usage
+        //
+        let data_create_pos = {
+            type : "create_pos",
+            parameters : {
+                fee : 100n,
+                name : "Greatest POS of all time"
+            }
+        };
+        console.log(dataFromObject(data_create_pos));
+
+        let data_delegate = {
+            type : "delegate",
+            parameters : {
+                pos_id : "509a266d46c2f395ff3021f09ddb58d018e60c51ba6dd63f41f8a91a913756d8",
+                amount : 1000000000000n
+            }
+        };
+        console.log(dataFromObject(data_delegate));
+
+        let data_undelegate = {
+            type : "undelegate",
+            parameters : {
+                pos_id : "509a266d46c2f395ff3021f09ddb58d018e60c51ba6dd63f41f8a91a913756d8",
+                amount : 50000000000n
+            }
+        };
+        console.log(dataFromObject(data_undelegate));
+
+        let data_transfer = {
+            type : "transfer",
+            parameters : {
+                undelegate_id : "4c35483b12568727faa910b08bdbe2f882cc5f6ad521930343abeb89658c7282"
+            }
+        };
+        console.log(dataFromObject(data_transfer));
+
+        //Claim reward method.
+        let data_pos_reward = {
+            type : "pos_reward",
+            parameters : {
+                pos_id : "4c35483b12568727faa910b08bdbe2f882cc5f6ad521930343abeb89658c7282"
+            }
+        };
+
+        console.log(dataFromObject(data_pos_reward));
+        ```
+        
+        # Tokens
+        
+        ## mint
+        
+        Increase token emission. Data field parameters:
+        
+        ```
+        {
+             "type": "mint",
+             "parameters": {
+                 "token_hash": "token hash",
+                 "amount": BigInt (10000000000000)
+             }
+        }
+        ```
+        
+        token_hash - hash of the token whose total_supply will be increased
+        
+        amount - the number of coins added to the token's total_supply. Available range of values: 0 ... MAX_SUPPLY_LIMIT
+        
+        The mint contract increases the total_supply of the token by the amount of coins. In this case, coins are credited to the account of the token holder. The contract can only be executed by the owner of the token.
+        
+        Execution of the mint contract is available only if the reissuable = 1 parameter was specified when creating the token.
+        
+        ## burn
+        
+        Reduce token emission. Data field parameters:
+        
+        ```
+        {
+            "type": "burn",
+            "parameters": {
+                "token_hash": "token hash",
+                "amount": BigInt (10000000000000)
+            }
+        }
+        ```
+        
+        token_hash - hash of the token whose total_supply will be reduced
+        
+        amount - the number of coins by which the total_supply token will be reduced. Available range of values: 0 ... <number of tokens on the owner's balance>
+        
+        The burn contract reduces the total_supply of the token by the amount of coins. In this case, the coins are debited from the token holder's account. The contract can only be executed by the owner of the token.
+        
+        Execution of the burn contract is available only if the reissuable = 1 parameter was specified when creating the token.
+        
+        # Contracts
+
+        Contract is a Enecuum transaction with additional data field that contains encoded contract parameters. Every contract type costs as a standard Enecuum transaction
+
+        ## create_pos
+
+        PoS-contract creation.
+        The data field parameters:
+
+        | Data field structure | Types |
+        | ---- | ---- |
+        | { | |
+        |    type : "create_pos",| String, contract type |
+        |    parameters : { } | |
+        |        fee : 100n,| BigInt (0 - 10000) |
+        |        name : “POS validator”| String (1-40 chars) |
+        |    } | |
+        | } |  |
+
+        fee - hundredths of a percent from 0 to 10000. 14% will be 1400;
+        name - POS-contract name
+
+        As a result, a PoS-contract is created. It will be used in other transactions. The hash of this transaction will be used as pos_id in the parameters of other transactions.
+
+        ## delegate
+
+        Delegation of coins, i.e. the act of lending funds to a contract.
+        Parameters of the data field:
+
+        | Data field structure| Types |
+        | ---- | ---- |
+        | { |  |
+        |     type : "delegate",| String, contract type |
+        |     parameters : { |  |
+        |         pos_id : "...",| String |
+        |         amount : 1000000000000n | BigInt (0 - MAX_SUPPLY_LIMIT) |
+        |      } |  |
+        | } |  |
+
+        The specified amount of coins is withdrawn from the sender’s account and is recorded in the delegates table. You can repeat it many times as long as there is available balance.
+        MAX_SUPPLY_LIMIT is a max possible safe integer = 2^64 - 1
+
+        ## undelegate
+
+        “Undelegation” of coins, i.e. the withdrawal of the lent funds.
+        Parameters of the data field:
+
+        | Data field structure| Types |
+        | ---- | ---- |
+        | { |  |
+        | type : "undelegate",| String, contract type |
+        | parameters : { |  |
+        |        pos_id : "...",| String |
+        |        amount : 1000000000000n| BigInt (0 - MAX_SUPPLY_LIMIT) |
+        |    } |  |
+        | } |  |
+        
+        Coins are withdrawn, i.e., the specified amount of coins goes to the undelegates table from the delegates table, creating a separate heap identified by the id of the undelegate transaction.
+
+        ## transfer
+
+        Unlocking coins, i.e., getting undelegated funds back to balance.
+        Parameters of the data field:
+
+        | Data field structure| Types |
+        | ---- | ---- |
+        | { |  |
+        |    type : "transfer",| String, contract type |
+        |    parameters : { |  |
+        |         undelegate_id : "..."| String |
+        |   } |  |
+        | } |  |
+
+
+        Coins from undelegates table are forwarded to balance.
+
+        **Example**: delegate transaction of 100 coins was sent; then, another one was sent, of 100 coins. The balance is decreased by 200 coins.
+
+        Then, the undelegate transactions are sent for 150, 40 and 10 coins. The hashes of these transactions are aaa, bbb, ccc.
+
+        Now, in order to return the funds to the balance, for each undelegate transaction the transfer transaction is sent with the corresponding hash (aaa, bbb or ccc)  in the parameters. That means there will be transactions for 150, 40 and 10 coins instead of one transaction for 200 coins.
+
+        **NB**: transfer transactions will be successful only after 10  blocks have been published after the undelegate transaction. In other cases, the transfer transactions will be rejected.
+
+        # POS rewards
+
+        The PoS-mining rewards are distributed among the one hundred PoS contracts that have the largest stakes, i.e., funds delegated to them. The stake sum of all PoS contracts participating in the PoS mining at a particular moment in time is called a total stake. The total reward for PoS mining is unchanged and amounts to 25% of the total emission. The amount of rewards for a particular contract is calculated as a portion of the total rewards in proportion to the contact stake in relation to total stake. The PoS-contracts rewards are calculated at the time of the macroblock publishing.
+
+        The PoS contract reward is divided into two parts in accordance with the fee parameter specified when creating the contract. The indicated percentage of funds is retained by the creator of the contract. The remaining funds are divided between the contract delegators in proportion to the funds contributed by them.
+
+        Rewards are accrued in arbitrary periods of time (from 1 to 3 days). When calculating rewards, the size of the user's delegated funds at the time of calculation is used.
+
+        The accrual of rewards occurs with every block published. The reward for the PoS owner goes directly to his/her main account. The reward for the delegator goes to his/her special reward balance.
+        To collect the delegator’s reward, the delegator sends the pos_reward transaction. The sender will be charged a standard system fee. 
+
+        To find out more on reward calculation, refer to ETP-4.
+
+        ## pos_reward
+
+        Transfer of coins from a reward balance to the main balance.
+        Parameters of the data field:
+
+        | Data field structure| Types |
+        | ---- | ---- |
+        | { |  |
+        |    type : "pos_reward",| String, contract type |
+        |    parameters : { |  |
+        |        pos_id : "..."| String |
+        |    } |  |
+        | } |  |
+        
+        As a result of the transaction, the entire accumulated PoS reward of the delegator is transferred to his/her main account.
+
+      example: 00920300000b0e00sum007f0f00000e0d00pos_id004807009261818a5c05bf603199e5802f74925ffc0faa8f03742cbd952d403ce5d70cb9000e0d00amount0013090010000000000
+      
+    Token:
+      type: string
+      description: Token hash.
+      example: "0000000000000000000000000000000000000000000000000000000000000000"
+      
+    Ticker:
+      type: string
+      description: An upper-case 1-6 letter token ticker.
+      example: ENQ
+      
+    Hash:
+      type: string
+      description: Transaction or block SHA256 hash.
+      example: 1274fe466eba7af8e012d0d7eb3f3a1d05ce50578529ba4055ece98b96656908
+    
+    Decimals:
+      type: integer
+      description: The number of decimal places.
+      example: 10
+      
+    PosID:
+      type: string
+      description: Transaction hash of PoS contract creation.
+      example: d8dac599c09429abd8f394ee2ef1465677d1e8b52e1f5f2bfd68125c8639e6ad
+    Owner:
+      type: string
+      description: Public key of the PoS contract or token creator.
+      example: 029dd222eeddd5c3340e8d46ae0a22e2c8e301bfee4903bcf8c899766c8ceb3a7d
+    Fee:
+      type: integer
+      description: PoS contract fee.
+      example: 100
+    Stake:
+      type: integer
+      description: The total number of assets stored on the contract.
+      example: 9960000000000
+    StakePower:
+      type: integer
+      description: Contract stake to total stake (all active and inactive PoS nodes stake) ratio. The contracts are sorted by this ratio.
+      example: 0.73668639
+    Nonce:
+      type: integer
+      description: Random number from 0 to 2^32.
+      example: 5761
+    Height:
+      type: integer
+      description: Blockchain height, i.e., total number of blocks.
+      example: 105678
+    Sign:
+      type: string
+      description: |
+                      The transaction signature.  The signature needs to be generated using the following JavaScript code:
+                      
+                      ```
+                      const crypto = require('crypto');
+                      let KeyEncoder = require('key-encoder').default;
+                      let keyEncoder = new KeyEncoder('secp256k1');
+              
+                      function ecdsa_sign(skey, msg){
+                          const sign = crypto.createSign('sha256');
+                          try {
+                              let pemPrivateKey = keyEncoder.encodePrivate(skey, 'raw', 'pem');
+                              sign.write(msg);
+                              sign.end();
+                              return sign.sign(pemPrivateKey, 'hex');
+                          }
+                          catch(err){
+                              return null;
+                          }
+                      }
+              
+                      let hash_tx = function(tx){
+                          if (!tx)
+                            return undefined;
+              
+                          let str = ['amount','data','from','nonce','ticker','to'].map(v => crypto.createHash('sha256').update(tx[v].toString().toLowerCase()).digest('hex')).join("");
+                          return crypto.createHash('sha256').update(str).digest('hex');
+                        }
+              
+                      // Note: amount is a String
+                      let amount = '1000000000000'; 
+                      let data = '';
+                      let nonce = 438721986634052;
+                      let ticker = '0000000000000000000000000000000000000000000000000000000000000000';
+              
+                      let to_acc = {pubkey:''}; //Recipient's public key.
+                      let from_acc = {pubkey:'', 
+                              prvkey:''}; //Sender's public and private keys.
+              
+                      let from = from_acc.pubkey;
+                      let to = to_acc.pubkey;    
+              
+                      let tx = {from, to, amount, nonce, data, ticker};
+              
+                      console.log(`from public key hash -> ${crypto.createHash('sha256').update(from.toString().toLowerCase()).digest('hex')}`);
+              
+                      let hash = crypto.createHash('sha256').update(['amount','data','from','nonce','ticker','to'].map(v => crypto.createHash('sha256').update(tx[v].toString().toLowerCase()).digest('hex')).join("")).digest('hex');
+              
+                      console.log(`all hash -> ${hash}`);
+              
+                      tx.sign = ecdsa_sign(from_acc.prvkey, hash);
+              
+                      console.log(tx);
+                      ``` 
+      example: 3046022100dc14629aeb2b8b63424a9cbc8d6b2b4af3e60db0ebcecdd2853043ba73f753ca022100ce96750c3ee976691a762d4511eecf86bbf093e3b354189c31e26e5c90c6c007
+    ReferrerStake:
+      type: integer
+      description: PoA node stake required to participate in the referral program as an agent (referrer). More in the [documentation](https://guides.enecuum.com/enq/referral.html). The returned value is multiplied by 10^10.
+      example: 10000000000000
+    MinStake:
+      type: integer
+      description: Minimum stake required for mining.
+      example: 250000000000
+    Reissuable:
+      type: integer
+      description:  1 means the token has flexible supply, i.e., after tokens release, its supply can be changed by issuing or burning of coins. 0 means the token's supply can't be changed. 
+      example: 1
+      enum: [0,1]
+    Minable:
+      type: integer
+      description: 1 means the token can be mined. Some volume is selected for instant release (pre-mine), and the rest is mined by users. 0 means the token can't be mined.
+      example: 0
+      enum: [0,1]
+    Schema:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+
+      
+tags:
+  - name: General
+  - name: Token
+  - name: PoS
+    externalDocs:
+      url: https://guides.enecuum.com/how-to-pos.html
